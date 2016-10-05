@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: wordpressdb
+  name: wordpressdb
+  namespace: default
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    run: wordpressdb
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+

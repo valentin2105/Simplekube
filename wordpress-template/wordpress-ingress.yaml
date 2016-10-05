@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: wp
+spec:
+  rules:
+  - host: wp.example.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: wp
+          servicePort: 80
+status:
+  loadBalancer: {}

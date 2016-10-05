@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  generation: 2
+  labels:
+    run: wp
+  name: wp
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: wp
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: wp
+    spec:
+      containers:
+        - image: wordpress:latest
+          name: wp
+          env:
+          - name: WORDPRESS_DB_PASSWORD
+            value: pAssw0rd
+          - name: WORDPRESS_DB_HOST
+            value: wordpressdb.default.svc.cluster.local
+          ports:
+            - containerPort: 80
+              name: wp
+          volumeMounts:
+            - name: wp
+              mountPath: /var/www/html
+      volumes:
+        - hostPath:
+              path: /mnt/kube/wordpress-template/www
+          name: wp
+
