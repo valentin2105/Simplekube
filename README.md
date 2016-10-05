@@ -6,3 +6,6 @@
 ### Heapster (InfluxDB/Grafana)
 ### Traefik as a Ingress TLS reverse-proxy
 ### The Kubernetes dashboard
+### BusyBox for check the DNS
+
+## Here soon, a clean Kubernetes 1.4 installation procedure. 
