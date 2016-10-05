@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pxc-node1
+  namespace: default
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+      name: mysql
+    - port: 4444
+      targetPort: 4444 
+      name: state-snapshot-transfer
+    - port: 4567
+      targetPort: 4567
+      name: replication-traffic 
+    - port: 4568
+      targetPort: 4568 
+      name: incremental-state-transfer 
+  selector:
+    name: pxc-node1 
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
