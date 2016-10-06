@@ -4,6 +4,7 @@
 
 - KubeDNS
 - Heapster (InfluxDB/Grafana)
+- EFK (Elasticsearch/FluentD/Kibana)
 - Traefik as a Ingress TLS reverse-proxy
 - The Kubernetes dashboard
 - BusyBox for check the DNS
