@@ -2,6 +2,10 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: wp
+  annotations:
+    traefik.backend.loadbalancer.method: drr
+    traefik.frontend.passHostHeader: "true"
+    traefik.frontend.rule.type: PathPrefix
 spec:
   rules:
   - host: wp.example.com

@@ -3,6 +3,10 @@ kind: Ingress
 metadata:
   name: kibana-logging
   namespace: kube-system
+  annotations:
+    traefik.backend.loadbalancer.method: drr
+    traefik.frontend.passHostHeader: "true"
+    traefik.frontend.rule.type: PathPrefix
 spec:
   rules:
   - host: kibana.example.com

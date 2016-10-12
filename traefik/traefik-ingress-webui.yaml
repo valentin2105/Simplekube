@@ -15,6 +15,10 @@ kind: Ingress
 metadata:
   name: traefik-web-ui
   namespace: kube-system
+  annotations:
+    traefik.backend.loadbalancer.method: drr
+    traefik.frontend.passHostHeader: "true"
+    traefik.frontend.rule.type: PathPrefix
 spec:
   rules:
   - host: traefik-ui.local
