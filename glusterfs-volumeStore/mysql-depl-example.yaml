@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  generation: 1
+  labels:
+    run: glusterdb
+  name: glusterdb
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: glusterdb
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: glusterdb
+    spec:
+      containers:
+        - image: mysql:latest
+          name: glusterdb
+          env:
+          - name: MYSQL_ROOT_PASSWORD
+          # Change this password!
+            value: pAssw0rd
+          ports:
+            - containerPort: 80
+              name: glusterdb
+          volumeMounts:
+            - name: glusterdb
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: glusterdb
+          glusterfs:
+            endpoints: glusterfs-cluster
+            path: kubernetes (gluster:/kubernetes)
+            readOnly: false
+
