@@ -1,16 +1,5 @@
 # Kubernetes_Deployment
 
-## Here is some Kubernetes ressources & examples :
-
-- KubeDNS
-- Heapster (InfluxDB/Grafana)
-- EFK (Elasticsearch/FluentD/Kibana)
-- Traefik as a Ingress TLS reverse-proxy
-- The Kubernetes dashboard
-- BusyBox for check the DNS
-- MariaDB Percona cluster
-- GlusterFS for use as a DataStore
-
 ## K8-SingleNode : 
 A simple Kubernetes installation script  from scratch.
 
@@ -46,3 +35,16 @@ NAME                  STATUS    AGE
 local.machine.com     Ready     1d
 
 ```
+
+## Here is some Kubernetes ressources & examples :
+
+- KubeDNS
+- Heapster (InfluxDB/Grafana)
+- EFK (Elasticsearch/FluentD/Kibana)
+- Traefik as a Ingress TLS reverse-proxy
+- The Kubernetes dashboard
+- BusyBox for check the DNS
+- MariaDB Percona cluster
+- GlusterFS for use as a DataStore
+
+
