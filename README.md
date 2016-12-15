@@ -36,7 +36,7 @@ local.machine.com     Ready     1d
 
 ```
 
-## Here is some Kubernetes ressources & examples :
+## Some Kubernetes ressources & examples in this repo :
 
 - KubeDNS
 - Heapster (InfluxDB/Grafana)
