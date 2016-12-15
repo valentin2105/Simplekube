@@ -11,7 +11,7 @@
 - MariaDB Percona cluster
 - GlusterFS for use as a DataStore
 
-# K8-SingleNode : 
+## K8-SingleNode : 
 A simple Kubernetes installation script  from scratch.
 
 ### Install Steps :
@@ -43,6 +43,6 @@ etcd-0               Healthy   {"health": "true"}
 kubectl get node
 
 NAME                  STATUS    AGE
-local.vm	      Ready     1d
+local.machine.com     Ready     1d
 
 ```
