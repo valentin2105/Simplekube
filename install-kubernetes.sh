@@ -8,6 +8,8 @@ dockerVersion="1.12.4"
 hostIP="IPAddr"
 adminToken="aeTeiGheiboth4iecieshooriiReiwah"
 kubeletToken="eeso6iel6iR6oorie5vuv7quahseitha"
+
+hostname=$(cat /etc/hostname)
 ###############################
 ## Let's go :
 ###############################
@@ -60,6 +62,7 @@ cat > kubernetes-csr.json <<EOF
   "CN": "kubernetes",
   "hosts": [
     "$hostIP",
+    "$hostname",
     "10.32.0.1",
     "127.0.0.1"
   ],
