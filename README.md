@@ -1,6 +1,6 @@
 # SimpleKube
 
-[logo]: http://imgur.com/a/ht6gT
+[logo]: http://i.imgur.com/gMGVimd.png
 
 A simple installation script for easily deploy a single node Kubernetes cluster. 
 
