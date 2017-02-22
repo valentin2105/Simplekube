@@ -1,25 +1,23 @@
-# Kubernetes_Deployment
+# SimpleKube
 
-## K8-SingleNode : 
-A simple Kubernetes installation script  from scratch.
+A simple installation script for easily deploy a single node Kubernetes cluster. 
+Simple as a shell script. It allow you to deploy easily k8s for test or dev purpuses.
 
-### Install Steps :
+### How-to use it ?
 
-1- Configure the script `install-kubernetes.sh`
+1- Tweak the script `install_k8s.sh`
  
  ```
 k8Version="v1.5.2"
 etcdVersion="v3.1.11"
 dockerVersion="1.13.1"
-hostIP="IPAddr"
-adminToken="aeTeiGheiboth4iecieshooriiReiwah"
-kubeletToken="eeso6iel6iR6oorie5vuv7quahseitha"
+hostIP="192.268.1.42"
  ```
-2- Launch  the script
+2- Launch the script as root
 
-`./install-kubernetes.sh`
+`sudo ./install_k8s.sh`
 
-3- Play with Kubernetes in a single-node cluster
+3- You can play now with k8s 
 
 ```
 kubectl get cs 
@@ -33,18 +31,14 @@ kubectl get node
 
 NAME                  STATUS    AGE
 local.machine.com     Ready     1d
-
 ```
 
-### Some Kubernetes ressource & example in this repo :
+### Tweak you cluster :
 
 - KubeDNS
 - Heapster (InfluxDB/Grafana)
 - EFK (Elasticsearch/FluentD/Kibana)
-- Traefik as a Ingress TLS reverse-proxy
-- The Kubernetes dashboard
-- BusyBox for check the DNS
-- MariaDB Percona cluster
-- GlusterFS for use as a DataStore
-
+- NginxIngress Controller
+- Kube-lego for Let's Encrypt certs
+- Kubernetes Dashboard
 
