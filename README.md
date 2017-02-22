@@ -1,4 +1,4 @@
-<img src="http://i.imgur.com/gMGVimd.png" width="500">
+<img src="https://i.imgur.com/gMGVimd.png" width="500">
 
 A simple installation script for easily deploy a single node Kubernetes cluster. 
 
