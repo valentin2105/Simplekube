@@ -2,10 +2,10 @@
 
 
 ## Set ip up :
-k8Version="v1.5.1"
-etcdVersion="v3.0.15"
-dockerVersion="1.12.4"
-hostIP="IPAddr"
+k8Version="v1.5.2"
+etcdVersion="v3.1.1"
+dockerVersion="1.13.1"
+hostIP="ServerIPv4"
 adminToken="aeTeiGheiboth4iecieshooriiReiwah"
 kubeletToken="eeso6iel6iR6oorie5vuv7quahseitha"
 
@@ -382,4 +382,5 @@ sudo systemctl enable kube-proxy
 sudo systemctl start kube-proxy
 
 sleep 3
-kubectl get cs ; kubectl get nodes
+echo "" 
+kubectl get cs ; echo "" ;  kubectl get nodes

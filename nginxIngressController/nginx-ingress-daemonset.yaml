@@ -10,8 +10,6 @@ spec:
         name: nginx-ingress-lb
     spec:
       terminationGracePeriodSeconds: 60
-      nodeSelector:
-        node_type: front
       containers:
       - image: gcr.io/google_containers/nginx-ingress-controller:0.8.3
         name: nginx-ingress-lb
