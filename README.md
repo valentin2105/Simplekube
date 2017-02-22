@@ -1,7 +1,8 @@
 # SimpleKube
 
 A simple installation script for easily deploy a single node Kubernetes cluster. 
-Simple as a shell script. It allow you to deploy easily k8s for test or dev purpuses.
+
+> Simple as a shell script. It allow you to deploy easily k8s for test or dev purposes.
 
 ### How-to use it ?
 
@@ -41,4 +42,4 @@ local.machine.com     Ready     1d
 - NginxIngress Controller
 - Kube-lego for Let's Encrypt certs
 - Kubernetes Dashboard
-
+- Wordpress template
