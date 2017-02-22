@@ -1,5 +1,7 @@
 # SimpleKube
 
+[logo]: http://imgur.com/a/ht6gT
+
 A simple installation script for easily deploy a single node Kubernetes cluster. 
 
 > Simple as a shell script. It allow you to deploy easily k8s for test or dev purposes.
