@@ -8,9 +8,9 @@ A simple Kubernetes installation script  from scratch.
 1- Configure the script `install-kubernetes.sh`
  
  ```
-k8Version="v1.5.1"
-etcdVersion="v3.0.15"
-dockerVersion="1.12.4"
+k8Version="v1.5.2"
+etcdVersion="v3.1.11"
+dockerVersion="1.13.1"
 hostIP="IPAddr"
 adminToken="aeTeiGheiboth4iecieshooriiReiwah"
 kubeletToken="eeso6iel6iR6oorie5vuv7quahseitha"
