@@ -1,6 +1,6 @@
 <img src="https://i.imgur.com/gMGVimd.png" width="500">
 
-A simple installation script for easily deploy a single node Kubernetes cluster. 
+A simple installation script for easily deploy a single node Kubernetes cluster. (tested on Ubuntu 16.04)
 
 > Simple as a shell script. It allow you to deploy easily k8s for test or dev purposes.
 
