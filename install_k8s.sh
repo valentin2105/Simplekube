@@ -2,8 +2,8 @@
 
 
 ## Set ip up :
-k8Version="v1.5.2"
-etcdVersion="v3.1.1"
+k8Version="v1.5.5"
+etcdVersion="v3.1.4"
 dockerVersion="1.13.1"
 hostIP="ServerIPv4"
 
