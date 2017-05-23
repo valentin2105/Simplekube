@@ -2,8 +2,8 @@
 
 
 ## Set ip up :
-k8Version="v1.5.5"
-etcdVersion="v3.1.4"
+k8Version="v1.6.4"
+etcdVersion="v3.1.8"
 dockerVersion="1.13.1"
 hostIP="ServerIPv4"
 
@@ -345,7 +345,6 @@ ExecStart=/usr/bin/kubelet \
   --docker=unix:///var/run/docker.sock \
   --network-plugin=kubenet \
   --kubeconfig=/var/lib/kubelet/kubeconfig \
-  --reconcile-cidr=true \
   --serialize-image-pulls=false \
   --tls-cert-file=/var/lib/kubernetes/kubernetes.pem \
   --tls-private-key-file=/var/lib/kubernetes/kubernetes-key.pem \
