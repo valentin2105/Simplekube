@@ -9,8 +9,8 @@ A simple installation script for easily deploy a single node Kubernetes cluster.
 1- Tweak the script `install_k8s.sh`
  
  ```
-k8Version="v1.5.2"
-etcdVersion="v3.1.11"
+k8Version="v1.6.4"
+etcdVersion="v3.1.8"
 dockerVersion="1.13.1"
 hostIP="192.268.1.42"
  ```
