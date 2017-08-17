@@ -461,6 +461,24 @@ sleep 5
 echo "" 
 kubectl get cs ; echo "" ;  kubectl get nodes
 
+# Defautl cluster policy
+cat <<EOF | calicoctl create -f -
+- apiVersion: v1
+  kind: policy
+  metadata:
+    name: default
+  spec:
+    egress:
+    - action: allow
+      destination: {}
+      source: {}
+    ingress:
+    - action: allow
+      destination: {}
+      source: {}
+    selector: ""
+EOF
+
 # KubeDNS
 cat <<EOF | kubectl create -f -
 
@@ -753,4 +771,20 @@ EOF
 kubectl create -f https://git.io/kube-dashboard  
 
 # Init HELM
-helm init
+kubectl create serviceaccount tiller --namespace kube-system
+
+cat <<EOF | kubectl create -f -
+  kind: ClusterRoleBinding
+  apiVersion: rbac.authorization.k8s.io/v1beta1
+  metadata:
+    name: tiller-clusterrolebinding
+  subjects:
+  - kind: ServiceAccount
+    name: tiller
+    namespace: kube-system
+  roleRef:
+    kind: ClusterRole
+    name: cluster-admin
+    apiGroup: ""
+EOF
+helm init --service-account tiller --upgrade
