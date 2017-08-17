@@ -15,6 +15,7 @@ k8sVersion="v1.7.3"
 etcdVersion="v3.2.5"
 dockerVersion="17.05.0-ce"
 cniVersion="v0.5.2"
+calicoCniVersion="v1.10.0"
 calicoctlVersion="v1.3.0"
 cfsslVersion="v1.2.0"
 hostIP="10.220.1.100"
@@ -47,10 +48,8 @@ local.machine.com     Ready     1d
 
 ### Tweak you cluster :
 
-- KubeDNS
 - Heapster (InfluxDB/Grafana)
 - EFK (Elasticsearch/FluentD/Kibana)
 - NginxIngress Controller
 - Kube-lego for Let's Encrypt certs
-- Kubernetes Dashboard
 - Wordpress template
