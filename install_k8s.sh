@@ -157,18 +157,8 @@ sudo mv kube-apiserver kube-controller-manager kube-scheduler kubectl /usr/bin/
 
 cat > token.csv <<EOF
 $adminToken,admin,admin
-$kubeletToken,kubelet,kubelet
 EOF
 sudo mv token.csv /var/lib/kubernetes
-
-#cat > /var/lib/kubernetes/authorization-policy.jsonl <<"EOF"
-#{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"user":"*", "nonResourcePath": "*", "readonly": true}}
-#{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"user":"admin", "namespace": "*", "resource": "*", "apiGroup": "*"}}
-#{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"user":"scheduler", "namespace": "*", "resource": "*", "apiGroup": "*"}}
-#{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"user":"kubelet", "namespace": "*", "resource": "*", "apiGroup": "*"}}
-#{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"group":"system:serviceaccounts", "namespace": "*", "resource": "*", "apiGroup": "*", "nonResourcePath": "*"}}
-#EOF
-  #--authorization-policy-file=/var/lib/kubernetes/authorization-policy.jsonl \
 
 cat > kube-apiserver.service <<EOF
 [Unit]
@@ -303,7 +293,7 @@ cat >  10-calico.conf <<EOF
 {
     "name": "calico-k8s-network",
     "type": "calico",
-    "etcd_endpoints": "http://$hostIP:2379",
+    "etcd_endpoints": "http://127.0.0.1:2379",
     "etcd_ca_cert_file": "/var/lib/kubernetes/ca.pem",
     "ipam": {
         "type": "calico-ipam",
@@ -332,14 +322,14 @@ Requires=docker.service
 [Service]
 User=root
 PermissionsStartOnly=true
-Environment=ETCD_ENDPOINTS=http://$hostIP:2379
+Environment=ETCD_ENDPOINTS=http://127.0.0.1:2379
 Environment=ETCD_CA_CERT_FILE=/var/lib/kubernetes/ca.pem
 ExecStart=/usr/bin/docker run --net=host --privileged --name=calico-node --rm -e CALICO_NETWORKING_BACKEND=bird  \
 	-e CALICO_LIBNETWORK_ENABLED=true -e CALICO_LIBNETWORK_IFPREFIX=cali  \
 	-e ETCD_AUTHORITY= -e ETCD_SCHEME= -e ETCD_CA_CERT_FILE=/etc/calico/certs/ca_cert.crt \
 	-e IP=$hostIP \
         -e NO_DEFAULT_POOLS= -e CALICO_LIBNETWORK_ENABLED=true  \
-	-e ETCD_ENDPOINTS=http://$hostIP:2379  \
+	-e ETCD_ENDPOINTS=http://127.0.0.1:2379  \
 	-v /var/lib/kubernetes/ca.pem:/etc/calico/certs/ca_cert.crt  \
 	-e NODENAME=$hostname -e CALICO_NETWORKING_BACKEND=bird  \
 	-v /var/run/calico:/var/run/calico -v /lib/modules:/lib/modules -v /var/log/calico:/var/log/calico  \
@@ -360,13 +350,12 @@ sudo systemctl daemon-reload
 sudo systemctl enable calico
 sudo systemctl start calico
 
-
-
 wget https://github.com/projectcalico/calicoctl/releases/download/$calicoctlVersion/calicoctl
 sudo mv calicoctl /usr/local/bin
 
 wget https://github.com/projectcalico/cni-plugin/releases/download/$calicoCniVersion/calico
 wget https://github.com/projectcalico/cni-plugin/releases/download/$calicoCniVersion/calico-ipam
+chmod +x calico calico-ipam
 sudo mv calico /etc/cni/net.d
 sudo mv calico-ipam /etc/cni/net.d
 
@@ -383,7 +372,7 @@ kind: Config
 clusters:
 - cluster:
     certificate-authority: /var/lib/kubernetes/ca.pem
-    server: https://$hostIP:6443
+    server: http://127.0.0.1:8080
   name: kubernetes
 contexts:
 - context:
@@ -420,7 +409,7 @@ ExecStart=/usr/bin/kubelet \
   --serialize-image-pulls=false \
   --tls-cert-file=/var/lib/kubernetes/kubernetes.pem \
   --tls-private-key-file=/var/lib/kubernetes/kubernetes-key.pem \
-  --api-servers=https://$hostIP:6443 \
+  --api-servers=http://127.0.0.1:8080 \
   --v=2
 
 Restart=on-failure
@@ -443,7 +432,7 @@ Documentation=https://github.com/GoogleCloudPlatform/kubernetes
 
 [Service]
 ExecStart=/usr/bin/kube-proxy \
-  --master=https://$hostIP:6443 \
+  --master=http://127.0.0.1:8080 \
   --kubeconfig=/var/lib/kubelet/kubeconfig \
   --proxy-mode=iptables \
   --v=2
