@@ -41,8 +41,10 @@ local.machine.com     Ready     1d
 ```
 4- Cluster's integrated components :
 
-  - Calico CNI plugin
   - KubeDNS
+  - Calico CNI plugin
+  - Calico Policy controller 
+  - HELM
   - KubeDashboard
   - RBAC by default
 
