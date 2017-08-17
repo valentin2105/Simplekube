@@ -6,6 +6,7 @@ k8sVersion="v1.7.3"
 etcdVersion="v3.2.5"
 dockerVersion="17.05.0-ce"
 cniVersion="v0.5.2"
+calicoCniVersion="v1.10.0"
 calicoctlVersion="v1.3.0"
 cfsslVersion="v1.2.0"
 hostIP="internalIP"
@@ -296,7 +297,7 @@ sudo docker version
 
 sudo mkdir -p /etc/cni/net.d
 wget https://github.com/containernetworking/cni/releases/download/"$cniVersion"/cni-amd64-"$cniVersion".tgz
-sudo tar -xvf cni-amd64-"$cniVersion".tgs -C /etc/cni/net.d
+sudo tar -xvf cni-amd64-"$cniVersion".tgz -C /etc/cni/net.d
 
 cat >  10-calico.conf <<EOF
 {
@@ -363,6 +364,11 @@ sudo systemctl start calico
 
 wget https://github.com/projectcalico/calicoctl/releases/download/$calicoctlVersion/calicoctl
 sudo mv calicoctl /usr/local/bin
+
+wget https://github.com/projectcalico/cni-plugin/releases/download/$calicoCniVersion/calico
+wget https://github.com/projectcalico/cni-plugin/releases/download/$calicoCniVersion/calico-ipam
+sudo mv calico /etc/cni/net.d
+sudo mv calico-ipam /etc/cni/net.d
 
 wget https://storage.googleapis.com/kubernetes-release/release/$k8sVersion/bin/linux/amd64/kubelet
 wget https://storage.googleapis.com/kubernetes-release/release/$k8sVersion/bin/linux/amd64/kube-proxy

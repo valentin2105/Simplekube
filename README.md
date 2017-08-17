@@ -4,7 +4,7 @@ A simple installation script for easily deploy a single node Kubernetes cluster.
 
 > Simple as a shell script. It allow you to deploy easily k8s for test or dev purposes.
 
-The idea between Simplekube is to give a way to install Kubernetes on simple Linux VM without have to plug with any cloud provider or Hypervisor. Just take a Linux VM, clone the git repo, launch the script and play with k8s !
+The idea behind Simplekube is to give a way to install Kubernetes on single Linux VM without have to plug with any cloud provider or Hypervisor. Just take a Linux VM, clone the git repo, launch the script and have fun with k8s !
 
 ### How-to use it ?
 
@@ -38,6 +38,12 @@ kubectl get node
 NAME                  STATUS    AGE
 local.machine.com     Ready     1d
 ```
+4- Cluster's integrated components :
+
+  - Calico CNI plugin
+  - KubeDNS
+  - KubeDashboard
+  - RBAC by default
 
 ### Tweak you cluster :
 
