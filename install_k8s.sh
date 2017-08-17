@@ -1,22 +1,21 @@
 #! /bin/bash
 
-
 ## Set ip up :
-k8Version="v1.7.3"
+k8sVersion="v1.7.3"
 etcdVersion="v3.2.5"
 dockerVersion="17.05.0-ce"
-hostIP="10.244.0.104"
+cniVersion="v0.5.2"
+calicoctlVersion="v1.3.0"
+hostIP="internalIP"
 
 adminToken="maeshah8Xee9ema9xahwohlaek9evoep3edaihio9Theib3ohSh7phoh9zo5aiv3"
 kubeletToken="ooshoovoh2quee0fe2OoshukaiNg9nooveiGaechiothiyequiel2uphie0uenai"
 
 hostname=$(cat /etc/hostname)
 
-
 ###############################
 ## Let's go :
 ###############################
-
 ## Certs
 wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
 chmod +x cfssl_linux-amd64
@@ -145,10 +144,10 @@ etcdctl --ca-file=/etc/etcd/ca.pem cluster-health
 sudo mkdir -p /var/lib/kubernetes
 sudo cp ca.pem kubernetes-key.pem kubernetes.pem /var/lib/kubernetes/
 
-wget https://storage.googleapis.com/kubernetes-release/release/"$k8Version"/bin/linux/amd64/kube-apiserver
-wget https://storage.googleapis.com/kubernetes-release/release/"$k8Version"/bin/linux/amd64/kube-controller-manager
-wget https://storage.googleapis.com/kubernetes-release/release/"$k8Version"/bin/linux/amd64/kube-scheduler
-wget https://storage.googleapis.com/kubernetes-release/release/"$k8Version"/bin/linux/amd64/kubectl
+wget https://storage.googleapis.com/kubernetes-release/release/"$k8sVersion"/bin/linux/amd64/kube-apiserver
+wget https://storage.googleapis.com/kubernetes-release/release/"$k8sVersion"/bin/linux/amd64/kube-controller-manager
+wget https://storage.googleapis.com/kubernetes-release/release/"$k8sVersion"/bin/linux/amd64/kube-scheduler
+wget https://storage.googleapis.com/kubernetes-release/release/"$k8sVersion"/bin/linux/amd64/kubectl
 
 
 chmod +x kube-apiserver kube-controller-manager kube-scheduler kubectl
@@ -159,13 +158,14 @@ $adminToken,admin,admin
 $kubeletToken,kubelet,kubelet
 EOF
 
-cat > /var/lib/kubernetes/authorization-policy.jsonl <<"EOF"
-{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"user":"*", "nonResourcePath": "*", "readonly": true}}
-{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"user":"admin", "namespace": "*", "resource": "*", "apiGroup": "*"}}
-{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"user":"scheduler", "namespace": "*", "resource": "*", "apiGroup": "*"}}
-{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"user":"kubelet", "namespace": "*", "resource": "*", "apiGroup": "*"}}
-{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"group":"system:serviceaccounts", "namespace": "*", "resource": "*", "apiGroup": "*", "nonResourcePath": "*"}}
-EOF
+#cat > /var/lib/kubernetes/authorization-policy.jsonl <<"EOF"
+#{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"user":"*", "nonResourcePath": "*", "readonly": true}}
+#{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"user":"admin", "namespace": "*", "resource": "*", "apiGroup": "*"}}
+#{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"user":"scheduler", "namespace": "*", "resource": "*", "apiGroup": "*"}}
+#{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"user":"kubelet", "namespace": "*", "resource": "*", "apiGroup": "*"}}
+#{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"group":"system:serviceaccounts", "namespace": "*", "resource": "*", "apiGroup": "*", "nonResourcePath": "*"}}
+#EOF
+  #--authorization-policy-file=/var/lib/kubernetes/authorization-policy.jsonl \
 
 cat > kube-apiserver.service <<EOF
 [Unit]
@@ -178,8 +178,7 @@ ExecStart=/usr/bin/kube-apiserver \
   --advertise-address=$hostIP \
   --allow-privileged=true \
   --apiserver-count=1 \
-  --authorization-mode=RBAC,ABAC \
-  --authorization-policy-file=/var/lib/kubernetes/authorization-policy.jsonl \
+  --authorization-mode=RBAC \
   --bind-address=0.0.0.0 \
   --enable-swagger-ui=true \
   --etcd-cafile=/var/lib/kubernetes/ca.pem \
@@ -212,14 +211,17 @@ Documentation=https://github.com/GoogleCloudPlatform/kubernetes
 
 [Service]
 ExecStart=/usr/bin/kube-controller-manager \
-  --allocate-node-cidrs=true \
-  --cluster-cidr=10.200.0.0/16 \
   --cluster-name=kubernetes \
   --leader-elect=true \
   --master=http://127.0.0.1:8080 \
   --root-ca-file=/var/lib/kubernetes/ca.pem \
-  --service-account-private-key-file=/var/lib/kubernetes/kubernetes-key.pem \
-  --service-cluster-ip-range=10.32.0.0/24 \
+  --service-cluster-ip-range=10.32.0.0/16 \
+  --pod-eviction-timeout 30s \
+  --service-account-private-key-file=/var/lib/kubernetes/ca-key.pem \
+  --cluster-name=kubernetes \
+  --cluster-signing-cert-file=/var/lib/kubernetes/ca.pem \
+  --cluster-signing-key-file=/var/lib/kubernetes/ca-key.pem \
+  --service-cluster-ip-range=10.32.0.0/16 \
   --v=2
 Restart=on-failure
 RestartSec=5
@@ -275,7 +277,7 @@ ExecStart=/usr/bin/docker daemon \
   --ip-masq=false \
   --host=unix:///var/run/docker.sock \
   --log-level=error \
-  --storage-driver=overlay
+  --storage-driver=overlay2
 Restart=on-failure
 RestartSec=5
 
@@ -289,13 +291,78 @@ sudo systemctl enable docker
 sudo systemctl start docker
 sudo docker version
 
-sudo mkdir -p /opt/cni
-wget https://storage.googleapis.com/kubernetes-release/network-plugins/cni-07a8a28637e97b22eb8dfe710eeae1344f69d16e.tar.gz
-sudo tar -xvf cni-07a8a28637e97b22eb8dfe710eeae1344f69d16e.tar.gz -C /opt/cni
+sudo mkdir -p /etc/cni/net.d
+wget https://github.com/containernetworking/cni/releases/download/"$cniVersion"/cni-amd64-"$cniVersion".tgz
+sudo tar -xvf cni-amd64-"$cniVersion".tgs -C /etc/cni/net.d
+
+cat >  10-calico.conf <<EOF
+{
+    "name": "calico-k8s-network",
+    "type": "calico",
+    "etcd_endpoints": "http://$hostIP:2379",
+    "etcd_ca_cert_file": "/var/lib/kubernetes/ca.pem",
+    "ipam": {
+        "type": "calico-ipam",
+        "assign_ipv4": "true",
+        "assign_ipv6": "false"
+
+    },
+    "policy": {
+        "type": "k8s"
+    },
+    "kubernetes": {
+        "kubeconfig": "/var/lib/kubelet/kubeconfig"
+    }
+}
+
+EOF
+
+sudo mv 10-calico.conf /etc/cni/net.d/
+
+cat > calico.service  <<EOF
+[Unit]
+Description=calico node
+After=docker.service
+Requires=docker.service
+
+[Service]
+User=root
+PermissionsStartOnly=true
+Environment=ETCD_ENDPOINTS=http://$hostIP:2379
+Environment=ETCD_CA_CERT_FILE=/var/lib/kubernetes/ca.pem
+ExecStart=/usr/bin/docker run --net=host --privileged --name=calico-node --rm -e CALICO_NETWORKING_BACKEND=bird  \
+	-e CALICO_LIBNETWORK_ENABLED=true -e CALICO_LIBNETWORK_IFPREFIX=cali  \
+	-e ETCD_AUTHORITY= -e ETCD_SCHEME= -e ETCD_CA_CERT_FILE=/etc/calico/certs/ca_cert.crt \
+	-e IP=$hostIP \
+        -e NO_DEFAULT_POOLS= -e CALICO_LIBNETWORK_ENABLED=true  \
+	-e ETCD_ENDPOINTS=http://$hostIP:2379  \
+	-v /var/lib/kubernetes/ca.pem:/etc/calico/certs/ca_cert.crt  \
+	-e NODENAME=$hostname -e CALICO_NETWORKING_BACKEND=bird  \
+	-v /var/run/calico:/var/run/calico -v /lib/modules:/lib/modules -v /var/log/calico:/var/log/calico  \
+	-v /run/docker/plugins:/run/docker/plugins -v /var/run/docker.sock:/var/run/docker.sock  \
+	calico/node:latest
+ExecStop=/usr/bin/docker rm -f calico-node
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+
+EOF
+
+sudo mv calico.service /etc/systemd/system/
+
+sudo systemctl daemon-reload
+sudo systemctl enable calico
+sudo systemctl start calico
 
 
-wget https://storage.googleapis.com/kubernetes-release/release/$k8Version/bin/linux/amd64/kubelet
-wget https://storage.googleapis.com/kubernetes-release/release/$k8Version/bin/linux/amd64/kube-proxy
+
+wget https://github.com/projectcalico/calicoctl/releases/download/$calicoctlVersion/calicoctl
+sudo mv calicoctl /usr/local/bin
+
+wget https://storage.googleapis.com/kubernetes-release/release/$k8sVersion/bin/linux/amd64/kubelet
+wget https://storage.googleapis.com/kubernetes-release/release/$k8sVersion/bin/linux/amd64/kube-proxy
 
 chmod +x  kube-proxy kubelet
 sudo mv kube-proxy kubelet /usr/bin/
@@ -321,7 +388,7 @@ users:
     token: $kubeletToken
 EOF
 
-mv kubeconfig /var/lib/kubelet/
+sudo mv kubeconfig /var/lib/kubelet/
 
 cat > kubelet.service  <<EOF
 [Unit]
@@ -338,7 +405,8 @@ ExecStart=/usr/bin/kubelet \
   --cluster-domain=cluster.local \
   --container-runtime=docker \
   --docker=unix:///var/run/docker.sock \
-  --network-plugin=kubenet \
+  --network-plugin=cni \
+  --network-plugin-dir=/etc/cni/net.d \
   --kubeconfig=/var/lib/kubelet/kubeconfig \
   --serialize-image-pulls=false \
   --tls-cert-file=/var/lib/kubernetes/kubernetes.pem \
@@ -353,7 +421,7 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF
 
-mv kubelet.service /etc/systemd/system/
+sudo mv kubelet.service /etc/systemd/system/
 
 sudo systemctl daemon-reload
 sudo systemctl enable kubelet
@@ -378,7 +446,7 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF
 
-mv kube-proxy.service /etc/systemd/system/
+sudo mv kube-proxy.service /etc/systemd/system/
 
 sudo systemctl daemon-reload
 sudo systemctl enable kube-proxy
