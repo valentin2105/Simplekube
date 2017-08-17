@@ -2,13 +2,13 @@
 
 
 ## Set ip up :
-k8Version="v1.6.4"
-etcdVersion="v3.1.8"
-dockerVersion="1.13.1"
-hostIP="ServerIPv4"
+k8Version="v1.7.3"
+etcdVersion="v3.2.5"
+dockerVersion="17.05.0-ce"
+hostIP="10.244.0.104"
 
-adminToken="aeTeiGheiboth4iecieshooriiReiwah"
-kubeletToken="eeso6iel6iR6oorie5vuv7quahseitha"
+adminToken="maeshah8Xee9ema9xahwohlaek9evoep3edaihio9Theib3ohSh7phoh9zo5aiv3"
+kubeletToken="ooshoovoh2quee0fe2OoshukaiNg9nooveiGaechiothiyequiel2uphie0uenai"
 
 hostname=$(cat /etc/hostname)
 
@@ -93,8 +93,6 @@ cfssl gencert \
   -profile=kubernetes \
   kubernetes-csr.json | cfssljson -bare kubernetes
 
-
-
 ## ETCD
 sudo mkdir -p /etc/etcd/
 sudo cp ca.pem kubernetes-key.pem kubernetes.pem /etc/etcd/
@@ -143,7 +141,6 @@ sleep 3
 etcdctl --ca-file=/etc/etcd/ca.pem cluster-health
 
 
-
 ## K8 Master
 sudo mkdir -p /var/lib/kubernetes
 sudo cp ca.pem kubernetes-key.pem kubernetes.pem /var/lib/kubernetes/
@@ -181,7 +178,7 @@ ExecStart=/usr/bin/kube-apiserver \
   --advertise-address=$hostIP \
   --allow-privileged=true \
   --apiserver-count=1 \
-  --authorization-mode=ABAC \
+  --authorization-mode=RBAC,ABAC \
   --authorization-policy-file=/var/lib/kubernetes/authorization-policy.jsonl \
   --bind-address=0.0.0.0 \
   --enable-swagger-ui=true \
@@ -259,9 +256,7 @@ sudo systemctl enable kube-scheduler
 sudo systemctl start kube-scheduler
 
 sleep 3
-kubectl get componentstatuses
-
-
+kubectl get cs
 
 
 ## Worker
