@@ -1,11 +1,13 @@
 #! /bin/bash
-
-## Set ip up :
+# -----------------------
+# Set ip up :
+# -----------------------
 k8sVersion="v1.7.3"
 etcdVersion="v3.2.5"
 dockerVersion="17.05.0-ce"
 cniVersion="v0.5.2"
 calicoctlVersion="v1.3.0"
+cfsslVersion="v1.2.0"
 hostIP="internalIP"
 
 adminToken="maeshah8Xee9ema9xahwohlaek9evoep3edaihio9Theib3ohSh7phoh9zo5aiv3"
@@ -13,9 +15,8 @@ kubeletToken="ooshoovoh2quee0fe2OoshukaiNg9nooveiGaechiothiyequiel2uphie0uenai"
 
 hostname=$(cat /etc/hostname)
 
-###############################
 ## Let's go :
-###############################
+# ----------------------
 ## Certs
 wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
 chmod +x cfssl_linux-amd64
@@ -142,7 +143,7 @@ etcdctl --ca-file=/etc/etcd/ca.pem cluster-health
 
 ## K8 Master
 sudo mkdir -p /var/lib/kubernetes
-sudo cp ca.pem kubernetes-key.pem kubernetes.pem /var/lib/kubernetes/
+sudo cp ca.pem kubernetes-key.pem kubernetes.pem ca-key.pem /var/lib/kubernetes/
 
 wget https://storage.googleapis.com/kubernetes-release/release/"$k8sVersion"/bin/linux/amd64/kube-apiserver
 wget https://storage.googleapis.com/kubernetes-release/release/"$k8sVersion"/bin/linux/amd64/kube-controller-manager
@@ -153,10 +154,11 @@ wget https://storage.googleapis.com/kubernetes-release/release/"$k8sVersion"/bin
 chmod +x kube-apiserver kube-controller-manager kube-scheduler kubectl
 sudo mv kube-apiserver kube-controller-manager kube-scheduler kubectl /usr/bin/
 
-cat > /var/lib/kubernetes/token.csv <<EOF
+cat > token.csv <<EOF
 $adminToken,admin,admin
 $kubeletToken,kubelet,kubelet
 EOF
+sudo mv token.csv /var/lib/kubernetes
 
 #cat > /var/lib/kubernetes/authorization-policy.jsonl <<"EOF"
 #{"apiVersion": "abac.authorization.kubernetes.io/v1beta1", "kind": "Policy", "spec": {"user":"*", "nonResourcePath": "*", "readonly": true}}
@@ -289,6 +291,7 @@ sudo mv docker.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable docker
 sudo systemctl start docker
+sleep 2
 sudo docker version
 
 sudo mkdir -p /etc/cni/net.d
