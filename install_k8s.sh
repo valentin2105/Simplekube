@@ -179,7 +179,7 @@ ExecStart=/usr/bin/kube-apiserver \
   --insecure-bind-address=127.0.0.1 \
   --kubelet-certificate-authority=/var/lib/kubernetes/ca.pem \
   --etcd-servers=https://$hostIP:2379 \
-  --service-account-key-file=/var/lib/kubernetes/kubernetes-key.pem \
+  --service-account-key-file=/var/lib/kubernetes/ca-key.pem \
   --service-cluster-ip-range=10.32.0.0/16 \
   --service-node-port-range=30000-32767 \
   --tls-cert-file=/var/lib/kubernetes/kubernetes.pem \
@@ -570,23 +570,23 @@ EOF
 
 
 # Defautl cluster policy
-cat <<EOF | calicoctl create -f -
-- apiVersion: v1
-  kind: policy
-  metadata:
-    name: default
-  spec:
-    egress:
-    - action: allow
-      destination: {}
-      source: {}
-    ingress:
-    - action: allow
-      destination: {}
-      source: {}
-    selector: ""
-EOF
-
+#cat <<EOF | calicoctl create -f -
+#- apiVersion: v1
+#  kind: policy
+#  metadata:
+#    name: default
+#  spec:
+#    egress:
+#    - action: allow
+#      destination: {}
+#      source: {}
+#    ingress:
+#    - action: allow
+#      destination: {}
+#      source: {}
+#    selector: ""
+#EOF
+#
 # KubeDNS
 cat <<EOF | kubectl create -f -
 
@@ -652,7 +652,6 @@ spec:
         args:
         - --domain=$clusterDomain
         - --dns-port=10053
-        - --config-map=kube-dns
         # This should be set to v=2 only after the new image (cut from 1.5) has
         # been released, otherwise we will flood the logs.
         - --v=0
@@ -788,3 +787,9 @@ cat <<EOF | kubectl create -f -
     apiGroup: ""
 EOF
 helm init --service-account tiller --upgrade
+helm ls
+
+echo ""
+kubectl get pod,svc --all-namespaces
+echo ""
+echo "Your cluster is up and running !"
