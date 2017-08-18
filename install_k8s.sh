@@ -11,7 +11,7 @@ calicoctlVersion="v1.3.0"
 cfsslVersion="v1.2.0"
 helmVersion="v2.6.0"
 hostIP="internalIP"
-clusterDomain="cluster.default"
+clusterDomain="cluster.local"
 
 adminToken="maeshah8Xee9ema9xahwohlaek9evoep3edaihio9Theib3ohSh7phoh9zo5aiv3"
 kubeletToken="ooshoovoh2quee0fe2OoshukaiNg9nooveiGaechiothiyequiel2uphie0uenai"
