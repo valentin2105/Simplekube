@@ -496,12 +496,12 @@ spec:
             # Configure the policy controller with the location of
             # your etcd cluster.
             - name: ETCD_ENDPOINTS
-              value: "http://$hostIP:2379"
+              value: "http://127.0.0.1:2379"
             # Location of the Kubernetes API - this shouldn't need to be
             # changed so long as it is used in conjunction with
             # CONFIGURE_ETC_HOSTS="true".
             - name: K8S_API
-              value: "https://10.32.0.1:443"
+              value: "http://127.0.0.1:8080"
             # Configure /etc/hosts within the container to resolve
             # the kubernetes.default Service to the correct clusterIP
             # using the environment provided by the kubelet.
