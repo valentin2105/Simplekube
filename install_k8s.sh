@@ -46,7 +46,7 @@ echo '{
 echo '{
   "CN": "Kubernetes",
   "key": {
-    "algo": "ecsa",
+    "algo": "ecdsa",
     "size": 256
   },
   "names": [
