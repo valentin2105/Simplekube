@@ -2,7 +2,7 @@
 
 > Simple as a shell script. It allow you to deploy easily k8s for test or dev purposes.
 
-The idea behind Simplekube is to give a way to install Kubernetes on single Linux VM without have to plug with any cloud provider or Hypervisor. Just take a Linux VM, clone the git repo, launch the script and have fun with k8s !
+Simplekube a way to install Kubernetes on a single Linux server without have to plug with any cloud provider or Hypervisor. Just take a Linux empty box, clone the git repo, launch the script and have fun with k8s !
 
 ### How-to use it ?
 
@@ -61,7 +61,7 @@ You can expose easily your services with :
 
 ### Requirements
 
-This script download each k8s components with `wget` and launch them with `systemd units`. 
+This script download each k8s components with `wget` and launch k8s with `systemd units`. 
 You will need `socat` installed and `git` to fetch the Git repo !
 
 Feel free to open an Issue if you need assistance !
