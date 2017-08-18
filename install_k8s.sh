@@ -587,6 +587,42 @@ EOF
 #    selector: ""
 #EOF
 #
+
+# RBAC kube-system
+cat <<EOF | kubectl create -f -
+
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: kube-system-serviceaccounts-role
+rules:
+- apiGroups:
+  - "*"
+  - extensions
+  resources:
+  - pods
+  - namespaces
+  - networkpolicies
+  - configmaps
+  verbs:
+  - watch
+  - list
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: kube-system-serviceaccounts-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kube-system-serviceaccounts-role
+subjects:
+- kind: Group
+  name: system:serviceaccounts:kube-system
+  apiGroup: rbac.authorization.k8s.io
+
+EOF
+
+
 # KubeDNS
 cat <<EOF | kubectl create -f -
 
@@ -787,9 +823,25 @@ cat <<EOF | kubectl create -f -
     apiGroup: ""
 EOF
 helm init --service-account tiller --upgrade
-helm ls
+echo ""
+echo ""
+echo "Here his the deploye files :
+
+/etc/systemd/system/kube-apiserver.service
+/etc/systemd/system/kube-controller-manager.service
+/etc/systemd/system/kube-scheduler.service
+/etc/systemd/system/kube-proxy.service
+/etc/systemd/system/kubelet.service
+/etc/systemd/system/docker.service
+/etc/systemd/system/calico.service
+
+
+/var/lib/kubernetes
+/var/lib/kubelet
+.helm/
+"
 
 echo ""
 kubectl get pod,svc --all-namespaces
 echo ""
-echo "Your cluster is up and running !"
+tput bold && echo "Your cluster is up and running !" && tput sgr0
