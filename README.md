@@ -36,24 +36,23 @@ controller-manager   Healthy   ok
 scheduler            Healthy   ok
 etcd-0               Healthy   {"health": "true"}
 
-kubectl get node
+kubectl get pod --all-namespaces
 
-NAME                  STATUS    AGE
-local.machine.com     Ready     1d
 ```
 4- Cluster's integrated components :
 
   - KubeDNS
-  - Calico CNI plugin
-  - Calico Policy controller 
   - HELM ready
   - KubeDashboard
   - RBAC enabled by default
+  - Calico CNI plugin
+  - Calico Policy controller 
+  - Calicoctl
 
-### Tweak you cluster :
+### Requirements
 
-- Heapster (InfluxDB/Grafana)
-- EFK (Elasticsearch/FluentD/Kibana)
-- NginxIngress Controller
-- Kube-lego for Let's Encrypt certs
-- Wordpress template
+This script download each k8s components with `wget` and launch them with `systemd units`. 
+You will need `socat` installed and `git` to fetch the Git repo !
+
+Feel free to open an Issue if you need assistance !
+
