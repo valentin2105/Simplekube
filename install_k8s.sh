@@ -604,9 +604,12 @@ rules:
   - namespaces
   - networkpolicies
   - configmaps
+  - endpoints
+  - services
   verbs:
   - watch
   - list
+  - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -826,7 +829,7 @@ EOF
 helm init --service-account tiller --upgrade
 echo ""
 echo ""
-echo "Here his the deploye files :
+echo "Here his the deployed k8s files :
 
 /etc/systemd/system/kube-apiserver.service
 /etc/systemd/system/kube-controller-manager.service
