@@ -19,7 +19,7 @@ calicoCniVersion="v1.10.0"
 calicoctlVersion="v1.3.0"
 cfsslVersion="v1.2.0"
 helmVersion="v2.6.0"
-hostIP="internalIP"
+hostIP="__PUBLIC_OR_PRIVATE_IPV4"
 clusterDomain="cluster.local"
  ```
 2- Launch the script as user (with sudo right)
