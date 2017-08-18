@@ -570,22 +570,22 @@ EOF
 
 
 # Defautl cluster policy
-#cat <<EOF | calicoctl create -f -
-#- apiVersion: v1
-#  kind: policy
-#  metadata:
-#    name: default
-#  spec:
-#    egress:
-#    - action: allow
-#      destination: {}
-#      source: {}
-#    ingress:
-#    - action: allow
-#      destination: {}
-#      source: {}
-#    selector: ""
-#EOF
+cat <<EOF | calicoctl create -f -
+- apiVersion: v1
+  kind: policy
+  metadata:
+    name: default
+  spec:
+    egress:
+    - action: allow
+      destination: {}
+      source: {}
+    ingress:
+    - action: allow
+      destination: {}
+      source: {}
+    selector: ""
+EOF
 
 # KubeDNS
 cat <<EOF | kubectl create -f -
