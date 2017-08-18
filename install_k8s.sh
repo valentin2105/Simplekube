@@ -46,16 +46,15 @@ echo '{
 echo '{
   "CN": "Kubernetes",
   "key": {
-    "algo": "rsa",
-    "size": 2048
+    "algo": "ecsa",
+    "size": 256
   },
   "names": [
     {
       "C": "US",
-      "L": "Portland",
+      "L": "Cloud",
       "O": "Kubernetes",
-      "OU": "CA",
-      "ST": "Oregon"
+      "OU": "CA"
     }
   ]
 }' > ca-csr.json
@@ -71,19 +70,19 @@ cat > kubernetes-csr.json <<EOF
     "$hostIP",
     "$hostname",
     "10.32.0.1",
+    "kubernetes.default",
     "127.0.0.1"
   ],
   "key": {
-    "algo": "rsa",
-    "size": 2048
+    "algo": "ecdsa",
+    "size": 256
   },
   "names": [
     {
       "C": "US",
-      "L": "Portland",
+      "L": "Cloud",
       "O": "Kubernetes",
-      "OU": "Cluster",
-      "ST": "Oregon"
+      "OU": "Cluster"
     }
   ]
 }
@@ -366,7 +365,7 @@ wget https://storage.googleapis.com/kubernetes-release/release/$k8sVersion/bin/l
 wget https://storage.googleapis.com/kubernetes-release/release/$k8sVersion/bin/linux/amd64/kube-proxy
 
 wget https://storage.googleapis.com/kubernetes-helm/helm-$helmVersion-linux-amd64.tar.gz
-tar -zxvf helm-$helmVersion-amd64.tar.gz
+tar -zxvf helm-$helmVersion-linux-amd64.tar.gz
 mv linux-amd64/helm /usr/local/bin
 
 chmod +x  kube-proxy kubelet
