@@ -770,9 +770,9 @@ spec:
             # net memory requested by the pod constant.
             memory: 50Mi
         args:
-        - --cmd=nslookup kubernetes.default 127.0.0.1 >/dev/null
+        - --cmd=nslookup kubernetes.default.svc.$clusterDomain 127.0.0.1 >/dev/null
         - --url=/healthz-dnsmasq
-        - --cmd=nslookup kubernetes.default 127.0.0.1:10053 >/dev/null
+        - --cmd=nslookup kubernetes.default.svc.$clusterDomain 127.0.0.1:10053 >/dev/null
         - --url=/healthz-kubedns
         - --port=8080
         - --quiet
