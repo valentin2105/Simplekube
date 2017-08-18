@@ -44,9 +44,9 @@ local.machine.com     Ready     1d
   - KubeDNS
   - Calico CNI plugin
   - Calico Policy controller 
-  - HELM
+  - HELM ready
   - KubeDashboard
-  - RBAC by default
+  - RBAC enabled by default
 
 ### Tweak you cluster :
 
