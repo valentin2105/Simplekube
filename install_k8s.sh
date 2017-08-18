@@ -10,7 +10,7 @@ calicoCniVersion="v1.10.0"
 calicoctlVersion="v1.3.0"
 cfsslVersion="v1.2.0"
 helmVersion="v2.6.0"
-hostIP="internalIP"
+hostIP="__PUBLIC_OR_PRIVATE_IPV4__"
 clusterDomain="cluster.local"
 
 adminToken="maeshah8Xee9ema9xahwohlaek9evoep3edaihio9Theib3ohSh7phoh9zo5aiv3"
