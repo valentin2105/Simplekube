@@ -406,7 +406,7 @@ ExecStart=/usr/bin/kubelet \
   --allow-privileged=true \
   --cloud-provider= \
   --cluster-dns=10.32.0.10 \
-  --cluster-domain=cluster.local \
+  --cluster-domain=$clusterDomain \
   --container-runtime=docker \
   --docker=unix:///var/run/docker.sock \
   --network-plugin=cni \
@@ -496,7 +496,7 @@ spec:
             # Configure the policy controller with the location of
             # your etcd cluster.
             - name: ETCD_ENDPOINTS
-              value: "http://127.0.0.1:2379"
+              value: "http://$hostIP:2379"
             # Location of the Kubernetes API - this shouldn't need to be
             # changed so long as it is used in conjunction with
             # CONFIGURE_ETC_HOSTS="true".
