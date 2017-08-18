@@ -6,7 +6,7 @@ The idea behind Simplekube is to give a way to install Kubernetes on single Linu
 
 ### How-to use it ?
 
-1- Tweak the head of `install_k8s.sh`
+##### 1- Tweak the head of `install_k8s.sh`
  
  ```
 k8sVersion="v1.7.3"
@@ -20,11 +20,11 @@ helmVersion="v2.6.0"
 hostIP="__PUBLIC_OR_PRIVATE_IPV4"
 clusterDomain="cluster.local"
  ```
-2- Launch the script as user (with sudo power)
+##### 2- Launch the script as user (with sudo power)
 
 `./install_k8s.sh`
 
-3- You now play with k8s, helm, calicoctl (...)
+##### 3- You now play with kubectl, helm, calicoctl (...)
 
 ```
 kubectl get cs 
@@ -37,11 +37,11 @@ etcd-0               Healthy   {"health": "true"}
 kubectl get pod --all-namespaces
 NAMESPACE     NAME                                        READY     STATUS    RESTARTS   AGE
 kube-system   calico-policy-controller-4180354049-63p5v   1/1       Running   0          4m
-kube-system   kube-dns-1822236363-zzkdq                   4/4       Running   2          4m
+kube-system   kube-dns-1822236363-zzkdq                   4/4       Running   0          4m
 kube-system   kubernetes-dashboard-3313488171-lff6h       1/1       Running   0          4m
 kube-system   tiller-deploy-1884622320-0glqq              1/1       Running   0          4m
 ```
-4- Cluster's integrated components :
+##### 4- Cluster's integrated components :
 
   - KubeDNS
   - HELM ready
@@ -51,7 +51,7 @@ kube-system   tiller-deploy-1884622320-0glqq              1/1       Running   0 
   - Calico Policy controller 
   - Calicoctl
 
-5- Expose services :
+##### 5- Expose services :
 
 You can expose easily your services with :
 
