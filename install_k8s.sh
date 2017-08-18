@@ -457,26 +457,135 @@ sudo systemctl enable kube-proxy
 sudo systemctl start kube-proxy
 
 sleep 5
-echo "" 
 kubectl get cs ; echo "" ;  kubectl get nodes
 
-# Defautl cluster policy
-cat <<EOF | calicoctl create -f -
-- apiVersion: v1
-  kind: policy
-  metadata:
-    name: default
-  spec:
-    egress:
-    - action: allow
-      destination: {}
-      source: {}
-    ingress:
-    - action: allow
-      destination: {}
-      source: {}
-    selector: ""
+# Calico Policy-controller
+cat <<EOF | kubectl create -f -
+
+# Create this manifest using kubectl to deploy
+# the Calico policy controller on Kubernetes.
+# It deploys a single instance of the policy controller.
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: calico-policy-controller
+  namespace: kube-system
+  labels:
+    k8s-app: calico-policy
+spec:
+  # Only a single instance of the policy controller should be
+  # active at a time.  Since this pod is run as a Deployment,
+  # Kubernetes will ensure the pod is recreated in case of failure,
+  # removing the need for passive backups.
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: calico-policy-controller
+      namespace: kube-system
+      labels:
+        k8s-app: calico-policy
+    spec:
+      hostNetwork: true
+      containers:
+        - name: calico-policy-controller
+          # Make sure to pin this to your desired version.
+          image: calico/kube-policy-controller:v0.7.0
+          env:
+            # Configure the policy controller with the location of
+            # your etcd cluster.
+            - name: ETCD_ENDPOINTS
+              value: "http://127.0.0.1:2379"
+            # Location of the Kubernetes API - this shouldn't need to be
+            # changed so long as it is used in conjunction with
+            # CONFIGURE_ETC_HOSTS="true".
+            - name: K8S_API
+              value: "https://10.32.0.1:443"
+            # Configure /etc/hosts within the container to resolve
+            # the kubernetes.default Service to the correct clusterIP
+            # using the environment provided by the kubelet.
+            # This removes the need for KubeDNS to resolve the Service.
+            - name: CONFIGURE_ETC_HOSTS
+              value: "false"
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: calico-policy-controller
+  namespace: kube-system
+rules:
+  - apiGroups:
+    - ""
+    - extensions
+    resources:
+      - pods
+      - namespaces
+      - networkpolicies
+    verbs:
+      - watch
+      - list
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: calico-policy-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: calico-policy-controller
+subjects:
+- kind: ServiceAccount
+  name: calico-policy-controller
+  namespace: kube-system
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: calico-node
+  namespace: kube-system
+rules:
+  - apiGroups: [""]
+    resources:
+      - pods
+      - nodes
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: calico-node
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: calico-node
+subjects:
+- kind: ServiceAccount
+  name: calico-node
+  namespace: kube-system
+
 EOF
+
+
+
+# Defautl cluster policy
+#cat <<EOF | calicoctl create -f -
+#- apiVersion: v1
+#  kind: policy
+#  metadata:
+#    name: default
+#  spec:
+#    egress:
+#    - action: allow
+#      destination: {}
+#      source: {}
+#    ingress:
+#    - action: allow
+#      destination: {}
+#      source: {}
+#    selector: ""
+#EOF
 
 # KubeDNS
 cat <<EOF | kubectl create -f -
@@ -657,114 +766,6 @@ spec:
 
 EOF
 
-
-# Calico
-cat <<EOF | kubectl create -f -
-
-# Create this manifest using kubectl to deploy
-# the Calico policy controller on Kubernetes.
-# It deploys a single instance of the policy controller.
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: calico-policy-controller
-  namespace: kube-system
-  labels:
-    k8s-app: calico-policy
-spec:
-  # Only a single instance of the policy controller should be
-  # active at a time.  Since this pod is run as a Deployment,
-  # Kubernetes will ensure the pod is recreated in case of failure,
-  # removing the need for passive backups.
-  replicas: 1
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      name: calico-policy-controller
-      namespace: kube-system
-      labels:
-        k8s-app: calico-policy
-    spec:
-      hostNetwork: true
-      containers:
-        - name: calico-policy-controller
-          # Make sure to pin this to your desired version.
-          image: calico/kube-policy-controller:v0.7.0
-          env:
-            # Configure the policy controller with the location of
-            # your etcd cluster.
-            - name: ETCD_ENDPOINTS
-              value: "http://127.0.0.1:2379"
-            # Location of the Kubernetes API - this shouldn't need to be
-            # changed so long as it is used in conjunction with
-            # CONFIGURE_ETC_HOSTS="true".
-            - name: K8S_API
-              value: "https://10.32.0.1:443"
-            # Configure /etc/hosts within the container to resolve
-            # the kubernetes.default Service to the correct clusterIP
-            # using the environment provided by the kubelet.
-            # This removes the need for KubeDNS to resolve the Service.
-            - name: CONFIGURE_ETC_HOSTS
-              value: "false"
----
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: calico-policy-controller
-  namespace: kube-system
-rules:
-  - apiGroups:
-    - ""
-    - extensions
-    resources:
-      - pods
-      - namespaces
-      - networkpolicies
-    verbs:
-      - watch
-      - list
----
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: calico-policy-controller
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: calico-policy-controller
-subjects:
-- kind: ServiceAccount
-  name: calico-policy-controller
-  namespace: kube-system
----
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: calico-node
-  namespace: kube-system
-rules:
-  - apiGroups: [""]
-    resources:
-      - pods
-      - nodes
-    verbs:
-      - get
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: calico-node
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: calico-node
-subjects:
-- kind: ServiceAccount
-  name: calico-node
-  namespace: kube-system
-
-EOF
 
 # KubeDashboard
 kubectl create -f https://git.io/kube-dashboard  
