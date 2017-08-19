@@ -22,7 +22,7 @@ clusterDomain="cluster.local"
  ```
 ##### 2- Launch the script as user (with sudo power)
 
-`./install_k8s.sh`
+`./install_k8s.sh --master`
 
 ##### 3- You now play with kubectl, helm, calicoctl (...)
 
