@@ -12,6 +12,7 @@ cfsslVersion="v1.2.0"
 helmVersion="v2.6.0"
 hostIP="__PUBLIC_OR_PRIVATE_IPV4__"
 clusterDomain="cluster.local"
+enableIPinIP="True" # This feature can be disabled only if you use same network nodes
 setupFirewall="True"
 
 adminToken=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
@@ -28,7 +29,7 @@ if [[ "$1" == "--master" ]]; then
 if [[ "$setupFirewall" == "True" ]]; then
         apt-get update && apt-get -y install ufw
 	ufw allow ssh
-        ufw allow port 6443/tcp
+        ufw allow 6443/tcp
         ufw enable
 fi
 
