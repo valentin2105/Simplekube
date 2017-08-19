@@ -19,6 +19,9 @@ kubeletToken=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
 
 hostname=$(hostname)
 
+## TODO
+# 	- FIX CALICO POLICY ETCD CA
+
 ## Let's go :
 if [[ "$1" == "--master" ]]; then
 
@@ -518,6 +521,16 @@ spec:
             # This removes the need for KubeDNS to resolve the Service.
             - name: CONFIGURE_ETC_HOSTS
               value: "false"
+            - name: ETCD_CA_CERT_FILE
+              value: "/ca.pem"
+          volumeMounts:
+          - name: etcd-ca
+            mountPath: /ca.pem
+      volumes:
+      - name: etcd-ca
+        hostPath:
+          path: /var/lib/kubernetes/ca.pem
+
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
