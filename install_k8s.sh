@@ -12,14 +12,23 @@ cfsslVersion="v1.2.0"
 helmVersion="v2.6.0"
 hostIP="__PUBLIC_OR_PRIVATE_IPV4__"
 clusterDomain="cluster.local"
+setupFirewall="True"
 
-adminToken="maeshah8Xee9ema9xahwohlaek9evoep3edaihio9Theib3ohSh7phoh9zo5aiv3"
-kubeletToken="ooshoovoh2quee0fe2OoshukaiNg9nooveiGaechiothiyequiel2uphie0uenai"
+adminToken=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
+kubeletToken=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
 
-hostname=$(cat /etc/hostname)
+hostname=$(hostname)
 
 ## Let's go :
-# ----------------------
+if [[ "$1" == "--master" ]]; then
+
+if [[ "$setupFirewall" == "True" ]]; then
+        apt-get update && apt-get -y install ufw
+	ufw allow port 22
+        ufw allow port 6443
+        ufw enable
+fi
+
 ## Certs
 wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
 chmod +x cfssl_linux-amd64
@@ -157,7 +166,8 @@ chmod +x kube-apiserver kube-controller-manager kube-scheduler kubectl
 sudo mv kube-apiserver kube-controller-manager kube-scheduler kubectl /usr/bin/
 
 cat > token.csv <<EOF
-$adminToken,admin,admin
+$adminToken,admin,admin,"cluster-admin,system:masters"
+$kubeletToken,kubelet,kubelet,"cluster-admin,system:masters"
 EOF
 sudo mv token.csv /var/lib/kubernetes
 
@@ -378,7 +388,7 @@ kind: Config
 clusters:
 - cluster:
     certificate-authority: /var/lib/kubernetes/ca.pem
-    server: http://127.0.0.1:8080
+    server: https://$hostIP:6443
   name: kubernetes
 contexts:
 - context:
@@ -496,12 +506,12 @@ spec:
             # Configure the policy controller with the location of
             # your etcd cluster.
             - name: ETCD_ENDPOINTS
-              value: "http://127.0.0.1:2379"
+              value: "https://$hostIP:2379"
             # Location of the Kubernetes API - this shouldn't need to be
             # changed so long as it is used in conjunction with
             # CONFIGURE_ETC_HOSTS="true".
             - name: K8S_API
-              value: "http://127.0.0.1:8080"
+              value: "https://$hostIP:6443"
             # Configure /etc/hosts within the container to resolve
             # the kubernetes.default Service to the correct clusterIP
             # using the environment provided by the kubelet.
@@ -838,14 +848,230 @@ echo "Here his the deployed k8s files :
 /etc/systemd/system/kubelet.service
 /etc/systemd/system/docker.service
 /etc/systemd/system/calico.service
-
-
 /var/lib/kubernetes
 /var/lib/kubelet
-.helm/
 "
 
 echo ""
+sleep 3
 kubectl get pod,svc --all-namespaces
 echo ""
 tput bold && echo "Your cluster is up and running !" && tput sgr0
+exit 0
+
+fi
+
+
+if [[ "$1" == "--worker" ]]; then
+
+if [[ "$setupFirewall" == "True" ]]; then
+        apt-get update && apt-get -y install ufw
+        ufw allow port 22
+	ufw allow from $hostIP
+        ufw enable
+fi
+
+
+wget https://get.docker.com/builds/Linux/x86_64/docker-"$dockerVersion".tgz
+tar -xvf docker-"$dockerVersion".tgz
+sudo cp docker/docker* /usr/bin/
+
+cat > docker.service <<EOF
+[Unit]
+Description=Docker Application Container Engine
+Documentation=http://docs.docker.io
+
+[Service]
+ExecStart=/usr/bin/docker daemon \
+  --iptables=false \
+  --ip-masq=false \
+  --host=unix:///var/run/docker.sock \
+  --log-level=error \
+  --storage-driver=overlay2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo mv docker.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable docker
+sudo systemctl start docker
+sleep 2
+sudo docker version
+
+sudo mkdir -p /etc/cni/net.d
+wget https://github.com/containernetworking/cni/releases/download/"$cniVersion"/cni-amd64-"$cniVersion".tgz
+sudo tar -xvf cni-amd64-"$cniVersion".tgz -C /etc/cni/net.d
+
+cat >  10-calico.conf <<EOF
+{
+    "name": "calico-k8s-network",
+    "type": "calico",
+    "etcd_endpoints": "https://$hostIP:2379",
+    "etcd_ca_cert_file": "/var/lib/kubernetes/ca.pem",
+    "ipam": {
+        "type": "calico-ipam",
+        "assign_ipv4": "true",
+        "assign_ipv6": "false"
+
+    },
+    "policy": {
+        "type": "k8s"
+    },
+    "kubernetes": {
+        "kubeconfig": "/var/lib/kubelet/kubeconfig"
+    }
+}
+
+EOF
+
+sudo mv 10-calico.conf /etc/cni/net.d/
+
+cat > calico.service  <<EOF
+[Unit]
+Description=calico node
+After=docker.service
+Requires=docker.service
+
+[Service]
+User=root
+PermissionsStartOnly=true
+Environment=ETCD_ENDPOINTS=https://$hostIP:2379
+Environment=ETCD_CA_CERT_FILE=/var/lib/kubernetes/ca.pem
+ExecStart=/usr/bin/docker run --net=host --privileged --name=calico-node --rm -e CALICO_NETWORKING_BACKEND=bird  \
+	-e CALICO_LIBNETWORK_ENABLED=true -e CALICO_LIBNETWORK_IFPREFIX=cali  \
+	-e ETCD_AUTHORITY= -e ETCD_SCHEME= -e ETCD_CA_CERT_FILE=/etc/calico/certs/ca_cert.crt \
+	-e IP=$hostIP \
+        -e NO_DEFAULT_POOLS= -e CALICO_LIBNETWORK_ENABLED=true  \
+	-e ETCD_ENDPOINTS=https://$hostIP:2379  \
+	-v /var/lib/kubernetes/ca.pem:/etc/calico/certs/ca_cert.crt  \
+	-e NODENAME=$hostname -e CALICO_NETWORKING_BACKEND=bird  \
+	-v /var/run/calico:/var/run/calico -v /lib/modules:/lib/modules -v /var/log/calico:/var/log/calico  \
+	-v /run/docker/plugins:/run/docker/plugins -v /var/run/docker.sock:/var/run/docker.sock  \
+	calico/node:latest
+ExecStop=/usr/bin/docker rm -f calico-node
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+
+EOF
+
+sudo mv calico.service /etc/systemd/system/
+
+sudo systemctl daemon-reload
+sudo systemctl enable calico
+sudo systemctl start calico
+
+wget https://github.com/projectcalico/calicoctl/releases/download/$calicoctlVersion/calicoctl
+chmod +x calicoctl
+sudo mv calicoctl /usr/local/bin
+
+wget https://github.com/projectcalico/cni-plugin/releases/download/$calicoCniVersion/calico
+wget https://github.com/projectcalico/cni-plugin/releases/download/$calicoCniVersion/calico-ipam
+chmod +x calico calico-ipam
+sudo mv calico /etc/cni/net.d
+sudo mv calico-ipam /etc/cni/net.d
+
+wget https://storage.googleapis.com/kubernetes-release/release/$k8sVersion/bin/linux/amd64/kubelet
+wget https://storage.googleapis.com/kubernetes-release/release/$k8sVersion/bin/linux/amd64/kube-proxy
+
+wget https://storage.googleapis.com/kubernetes-helm/helm-$helmVersion-linux-amd64.tar.gz
+tar -zxvf helm-$helmVersion-linux-amd64.tar.gz
+mv linux-amd64/helm /usr/local/bin
+
+chmod +x  kube-proxy kubelet
+sudo mv kube-proxy kubelet /usr/bin/
+sudo mkdir -p /var/lib/kubelet/
+
+cat > kubeconfig  <<EOF
+apiVersion: v1
+kind: Config
+clusters:
+- cluster:
+    certificate-authority: /var/lib/kubernetes/ca.pem
+    server: https://$hostIP:6443
+  name: kubernetes
+contexts:
+- context:
+    cluster: kubernetes
+    user: kubelet
+  name: kubelet
+current-context: kubelet
+users:
+- name: kubelet
+  user:
+    token: $kubeletToken
+EOF
+
+sudo mv kubeconfig /var/lib/kubelet/
+
+cat > kubelet.service  <<EOF
+[Unit]
+Description=Kubernetes Kubelet
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStart=/usr/bin/kubelet \
+  --allow-privileged=true \
+  --cloud-provider= \
+  --cluster-dns=10.32.0.10 \
+  --cluster-domain=$clusterDomain \
+  --container-runtime=docker \
+  --docker=unix:///var/run/docker.sock \
+  --network-plugin=cni \
+  --network-plugin-dir=/etc/cni/net.d \
+  --kubeconfig=/var/lib/kubelet/kubeconfig \
+  --serialize-image-pulls=false \
+  --tls-cert-file=/var/lib/kubernetes/$hostname.pem \
+  --tls-private-key-file=/var/lib/kubernetes/$hostname-key.pem \
+  --api-servers=https://$hostIP:6443 \
+  --v=2
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo mv kubelet.service /etc/systemd/system/
+
+sudo systemctl daemon-reload
+sudo systemctl enable kubelet
+sudo systemctl start kubelet
+
+cat > kube-proxy.service  <<EOF
+[Unit]
+Description=Kubernetes Kube Proxy
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+
+[Service]
+ExecStart=/usr/bin/kube-proxy \
+  --master=https://$hostIP:6443 \
+  --kubeconfig=/var/lib/kubelet/kubeconfig \
+  --proxy-mode=iptables \
+  --v=2
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo mv kube-proxy.service /etc/systemd/system/
+
+sudo systemctl daemon-reload
+sudo systemctl enable kube-proxy
+sudo systemctl start kube-proxy
+exit 0
+fi
+
+
