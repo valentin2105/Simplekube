@@ -943,6 +943,7 @@ EOF
 
 sudo mv 10-calico.conf /etc/cni/net.d/
 
+#	-e IP=$hostIP \
 cat > calico.service  <<EOF
 [Unit]
 Description=calico node
@@ -957,7 +958,6 @@ Environment=ETCD_CA_CERT_FILE=/var/lib/kubernetes/ca.pem
 ExecStart=/usr/bin/docker run --net=host --privileged --name=calico-node --rm -e CALICO_NETWORKING_BACKEND=bird  \
 	-e CALICO_LIBNETWORK_ENABLED=true -e CALICO_LIBNETWORK_IFPREFIX=cali  \
 	-e ETCD_AUTHORITY= -e ETCD_SCHEME= -e ETCD_CA_CERT_FILE=/etc/calico/certs/ca_cert.crt \
-	-e IP=$hostIP \
         -e NO_DEFAULT_POOLS= -e CALICO_LIBNETWORK_ENABLED=true  \
 	-e ETCD_ENDPOINTS=https://$hostIP:2379  \
 	-v /var/lib/kubernetes/ca.pem:/etc/calico/certs/ca_cert.crt  \
@@ -999,29 +999,7 @@ mv linux-amd64/helm /usr/local/bin
 
 chmod +x  kube-proxy kubelet
 sudo mv kube-proxy kubelet /usr/bin/
-sudo mkdir -p /var/lib/kubelet/
 
-cat > kubeconfig  <<EOF
-apiVersion: v1
-kind: Config
-clusters:
-- cluster:
-    certificate-authority: /var/lib/kubernetes/ca.pem
-    server: https://$hostIP:6443
-  name: kubernetes
-contexts:
-- context:
-    cluster: kubernetes
-    user: kubelet
-  name: kubelet
-current-context: kubelet
-users:
-- name: kubelet
-  user:
-    token: $kubeletToken
-EOF
-
-sudo mv kubeconfig /var/lib/kubelet/
 
 cat > kubelet.service  <<EOF
 [Unit]
@@ -1086,5 +1064,3 @@ sudo systemctl enable kube-proxy
 sudo systemctl start kube-proxy
 exit 0
 fi
-
-
