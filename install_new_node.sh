@@ -4,7 +4,7 @@
 # -----------------------
 nodeIP="__PUBLIC_OR_PRIVATE_IPV4__"
 setupFirewall="True"
-CAcountry="$CAcountry"
+CAcountry="US"
 
 nodeHostname=$(ssh root@$nodeIP 'hostname')
 

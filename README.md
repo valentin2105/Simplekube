@@ -27,19 +27,24 @@ clusterDomain="cluster.local"
 ##### 3- You now play with kubectl, helm, calicoctl (...)
 
 ```
-kubectl get cs 
+$- kubectl get cs 
 
 NAME                 STATUS    MESSAGE              ERROR
 controller-manager   Healthy   ok
 scheduler            Healthy   ok
 etcd-0               Healthy   {"health": "true"}
 
-kubectl get pod --all-namespaces
+$- kubectl get pod --all-namespaces
 NAMESPACE     NAME                                        READY     STATUS    RESTARTS   AGE
 kube-system   calico-policy-controller-4180354049-63p5v   1/1       Running   0          4m
 kube-system   kube-dns-1822236363-zzkdq                   4/4       Running   0          4m
 kube-system   kubernetes-dashboard-3313488171-lff6h       1/1       Running   0          4m
 kube-system   tiller-deploy-1884622320-0glqq              1/1       Running   0          4m
+
+$- calicoctl get ippool
+CIDR
+192.168.0.0/16
+fd80:24e2:f998:72d6::/64
 ```
 ##### 4- Cluster's integrated components :
 
@@ -50,6 +55,7 @@ kube-system   tiller-deploy-1884622320-0glqq              1/1       Running   0 
   - Calico CNI plugin
   - Calico Policy controller 
   - Calicoctl
+  - UFW to secure access (can be disabled)
 
 ##### 5- Expose services :
 
@@ -58,6 +64,18 @@ You can expose easily your services with :
   - Only reachable on the machine : `ClusterIP`
   - Expose on high TCP ports : `NodePort`
   - Expose publicly : Service's `ExternalIPs`
+
+##### 6- Add new node if needed :
+
+You can easily add a new to your cluster by launching `./install_new_worker.sh`
+
+Before launch the script, be sure to tweak the script config :
+
+```
+nodeIP="__PUBLIC_OR_PRIVATE_IPV4__"
+setupFirewall="True"
+CAcountry="US"
+```
 
 ### Requirements
 
