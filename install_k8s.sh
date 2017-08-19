@@ -12,8 +12,9 @@ cfsslVersion="v1.2.0"
 helmVersion="v2.6.0"
 hostIP="__PUBLIC_OR_PRIVATE_IPV4__"
 clusterDomain="cluster.local"
-enableIPinIP="True" # This feature can be disabled only if you use same network nodes
 setupFirewall="True"
+enableIPinIP="True" # Disable only if your servers are in the same network
+CAcountry="US"
 
 adminToken=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
 kubeletToken=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
@@ -21,7 +22,6 @@ kubeletToken=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
 hostname=$(hostname)
 
 ## TODO
-# 	- FIX CALICO POLICY ETCD CA
 
 ## Let's go :
 if [[ "$1" == "--master" ]]; then
@@ -56,7 +56,8 @@ echo '{
 }' > ca-config.json
 
 
-echo '{
+cat > ca-csr.json <<EOF
+{
   "CN": "Kubernetes",
   "key": {
     "algo": "ecdsa",
@@ -64,13 +65,14 @@ echo '{
   },
   "names": [
     {
-      "C": "US",
+      "C": "$CAcountry",
       "L": "Cloud",
       "O": "Kubernetes",
       "OU": "CA"
     }
   ]
-}' > ca-csr.json
+}
+EOF
 
 
 cfssl gencert -initca ca-csr.json | cfssljson -bare ca
@@ -92,7 +94,7 @@ cat > kubernetes-csr.json <<EOF
   },
   "names": [
     {
-      "C": "US",
+      "C": "$CAcountry",
       "L": "Cloud",
       "O": "Kubernetes",
       "OU": "Cluster"
@@ -473,6 +475,22 @@ sudo systemctl start kube-proxy
 sleep 5
 kubectl get cs ; echo "" ;  kubectl get nodes
 
+# IP-in-IP
+if [[ "$enableIPinIP" == "True" ]]; then
+calicoctl delete ippool 192.168.0.0/16
+cat <<EOF | calicoctl create -f -
+- apiVersion: v1
+  kind: ipPool
+  metadata:
+    cidr: 192.168.0.0/16
+  spec:
+    ipip:
+      enabled: true
+      mode: always
+    nat-outgoing: true
+EOF
+fi
+
 # Calico Policy-controller
 cat <<EOF | kubectl create -f -
 
@@ -591,26 +609,6 @@ subjects:
 
 EOF
 
-
-
-# Defautl cluster policy
-#cat <<EOF | calicoctl create -f -
-#- apiVersion: v1
-#  kind: policy
-#  metadata:
-#    name: default
-#  spec:
-#    egress:
-#    - action: allow
-#      destination: {}
-#      source: {}
-#    ingress:
-#    - action: allow
-#      destination: {}
-#      source: {}
-#    selector: ""
-#EOF
-#
 
 # RBAC kube-system
 cat <<EOF | kubectl create -f -

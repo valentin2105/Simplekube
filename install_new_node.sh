@@ -4,21 +4,22 @@
 # -----------------------
 nodeIP="__PUBLIC_OR_PRIVATE_IPV4__"
 setupFirewall="True"
+CAcountry="$CAcountry"
 
 nodeHostname=$(ssh root@$nodeIP 'hostname')
 
 if [ ! -f ca.pem ]; then
-        echo "ca.pem don't exist, lauch ./install_k8s before !"
+        echo "ca.pem don't exist, lauch ./install_k8s --master before !"
 	exit 1
 fi
 
 if [ ! -f ca-key.pem ]; then
-        echo "ca-key.pem don't exist, lauch ./install_k8s before !"
+        echo "ca-key.pem don't exist, lauch ./install_k8s --master before !"
 	exit 1
 fi
 
 if [ ! -f ca-config.json ]; then
-        echo "ca-config.json don't exist, lauch ./install_k8s before !"
+        echo "ca-config.json don't exist, lauch ./install_k8s --master before !"
 	exit 1
 fi
 
@@ -44,7 +45,7 @@ cat > $nodeHostname-csr.json <<EOF
   },
   "names": [
     {
-      "C": "US",
+      "C": "$CAcountry",
       "L": "Cloud",
       "O": "Kubernetes",
       "OU": "Cluster"
