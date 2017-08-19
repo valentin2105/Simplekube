@@ -944,6 +944,7 @@ EOF
 sudo mv 10-calico.conf /etc/cni/net.d/
 
 #	-e IP=$hostIP \
+$IP=$(cat /tmp/IP)
 cat > calico.service  <<EOF
 [Unit]
 Description=calico node

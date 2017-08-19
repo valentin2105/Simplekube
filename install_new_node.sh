@@ -68,5 +68,6 @@ scp $nodeHostname-key.pem root@$nodeIP:/var/lib/kubernetes/
 scp ca.pem root@$nodeIP:/var/lib/kubernetes/
 scp install_k8s.sh root@$nodeIP:/opt/Simplekube/
 scp /var/lib/kubelet/kubeconfig root@$nodeIP:/var/lib/kubelet/
+ssh root@$nodeIP 'echo $nodeIP > /tmp/IP'
 
 ssh root@$nodeIP  '/opt/Simplekube/install_k8s.sh --worker'
