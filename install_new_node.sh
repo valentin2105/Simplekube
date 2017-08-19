@@ -58,7 +58,7 @@ cfssl gencert \
   -ca=ca.pem \
   -ca-key=ca-key.pem \
   -config=ca-config.json \
-  -profile=$nodeHostname \
+  -profile=kubernetes \
   $nodeHostname-csr.json | cfssljson -bare $nodeHostname
 
 ssh root@$nodeIP 'mkdir /var/lib/kubernetes && mkdir /var/lib/kubelet && mkdir /opt/Simplekube'
@@ -70,4 +70,3 @@ scp install_k8s.sh root@$nodeIP:/opt/Simplekube/
 scp /var/lib/kubelet/kubeconfig root@$nodeIP:/var/lib/kubelet/
 
 ssh root@$nodeIP  '/opt/Simplekube/install_k8s.sh --worker'
-
