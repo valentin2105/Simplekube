@@ -27,8 +27,8 @@ if [[ "$1" == "--master" ]]; then
 
 if [[ "$setupFirewall" == "True" ]]; then
         apt-get update && apt-get -y install ufw
-	ufw allow port 22
-        ufw allow port 6443
+	ufw allow ssh
+        ufw allow port 6443/tcp
         ufw enable
 fi
 
@@ -879,7 +879,7 @@ if [[ "$1" == "--worker" ]]; then
 
 if [[ "$setupFirewall" == "True" ]]; then
         apt-get update && apt-get -y install ufw
-        ufw allow port 22
+        ufw allow ssh
 	ufw allow from $hostIP
         ufw enable
 fi
