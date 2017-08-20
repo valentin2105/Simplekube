@@ -1062,5 +1062,7 @@ sudo mv kube-proxy.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable kube-proxy
 sudo systemctl start kube-proxy
+sleep 2
+kubectl get node -o wide
 exit 0
 fi
