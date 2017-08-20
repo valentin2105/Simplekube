@@ -52,9 +52,9 @@ fd80:24e2:f998:72d6::/64
   - RBAC only by default
   - Calico CNI plugin
   - Calico Policy controller 
-  - Calicoctl
+  - Calicoctl tool
   - UFW to secure access (can be disabled)
-  - ECDSA cluster certs
+  - ECDSA cluster certs w/ CFSSL
 
 #### 5- Expose services :
 
@@ -80,7 +80,9 @@ CAcountry="US"
 
 This script download each k8s components with `wget` and launch k8s with `systemd units`. 
 
-You will need `socat`, `conntrack`, `sudo` and `git` and you servers. 
+You will need `socat`, `conntrack`, `sudo` and `git` on your servers. 
+
+To add a node, you will need to setup `key-based` SSH authentification between master & workers.
 
 Simplekube is tested on `Debian 8/9` and `Ubuntu 16.x/17.x`.
 
