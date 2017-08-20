@@ -3,7 +3,7 @@
 # please change this value :
 hostIP="__PUBLIC_OR_PRIVATE_IPV4__"
 # -----------------------
-k8sVersion="v1.7.3"
+k8sVersion="v1.7.4"
 etcdVersion="v3.2.5"
 dockerVersion="17.05.0-ce"
 cniVersion="v0.5.2"
