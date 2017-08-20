@@ -1,6 +1,7 @@
 #! /bin/bash
 # -----------------------
-# Set ip up :
+# please change this value :
+hostIP="__PUBLIC_OR_PRIVATE_IPV4__"
 # -----------------------
 k8sVersion="v1.7.3"
 etcdVersion="v3.2.5"
@@ -10,10 +11,9 @@ calicoCniVersion="v1.10.0"
 calicoctlVersion="v1.3.0"
 cfsslVersion="v1.2.0"
 helmVersion="v2.6.0"
-hostIP="__PUBLIC_OR_PRIVATE_IPV4__"
 clusterDomain="cluster.local"
-setupFirewall="True"
-enableIPinIP="True" # Disable only if your servers are in the same network
+setupFirewall="True" #Setup UFW 
+enableIPinIP="True"
 CAcountry="US"
 
 adminToken=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)

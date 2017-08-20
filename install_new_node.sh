@@ -3,10 +3,11 @@
 # Set ip up :
 # -----------------------
 nodeIP="__PUBLIC_OR_PRIVATE_IPV4__"
+sshUser="root"
 setupFirewall="True"
 CAcountry="US"
 
-nodeHostname=$(ssh root@$nodeIP 'hostname')
+nodeHostname=$(ssh $sshUser@$nodeIP 'hostname')
 
 if [ ! -f ca.pem ]; then
         echo "ca.pem don't exist, lauch ./install_k8s --master before !"
@@ -62,13 +63,13 @@ cfssl gencert \
   -profile=kubernetes \
   $nodeHostname-csr.json | cfssljson -bare $nodeHostname
 
-ssh root@$nodeIP 'mkdir /var/lib/kubernetes && mkdir /var/lib/kubelet && mkdir /opt/Simplekube'
+ssh $sshUser@$nodeIP 'mkdir /var/lib/kubernetes && mkdir /var/lib/kubelet && mkdir /opt/Simplekube'
 
-scp $nodeHostname.pem root@$nodeIP:/var/lib/kubernetes/
-scp $nodeHostname-key.pem root@$nodeIP:/var/lib/kubernetes/
-scp ca.pem root@$nodeIP:/var/lib/kubernetes/
-scp install_k8s.sh root@$nodeIP:/opt/Simplekube/
-scp /var/lib/kubelet/kubeconfig root@$nodeIP:/var/lib/kubelet/
-ssh root@$nodeIP 'echo $nodeIP > /tmp/IP'
+scp $nodeHostname.pem $sshUser@$nodeIP:/var/lib/kubernetes/
+scp $nodeHostname-key.pem $sshUser@$nodeIP:/var/lib/kubernetes/
+scp ca.pem $sshUser@$nodeIP:/var/lib/kubernetes/
+scp install_k8s.sh $sshUser@$nodeIP:/opt/Simplekube/
+scp /var/lib/kubelet/kubeconfig $sshUser@$nodeIP:/var/lib/kubelet/
+ssh $sshUser@$nodeIP 'echo $nodeIP > /tmp/IP'
 
-ssh root@$nodeIP  '/opt/Simplekube/install_k8s.sh --worker'
+ssh $sshUser@$nodeIP  '/opt/Simplekube/install_k8s.sh --worker'

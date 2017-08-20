@@ -1,14 +1,14 @@
 <img src="https://i.imgur.com/gMGVimd.png" width="500">
 
-> Simple as a shell script. It allow you to deploy easily k8s for test or dev purposes.
+> Simple as a shell script. It allow you to deploy easily k8s for tests or learn purposes.
 
-Simplekube a way to install Kubernetes on a single Linux server without have to plug with any cloud provider or Hypervisor. Just take a Linux empty box, clone the git repo, launch the script and have fun with k8s ! And if you need, you can easily add few new workers !
+Simplekube is a simple way to install Kubernetes on Linux servers without have to plug with any cloud provider or VM Hypervisor. Just take a Linux empty box, clone the git repo, launch the script and have fun with k8s ! If you need, you can easily add new workers !
 
 ### How-to use it ?
 
 ##### 1- Tweak the head of `install_k8s.sh`
  
- ```
+```
 hostIP="__PUBLIC_OR_PRIVATE_IPV4__"
 k8sVersion="v1.7.3"
 etcdVersion="v3.2.5"
@@ -19,13 +19,12 @@ calicoctlVersion="v1.3.0"
 cfsslVersion="v1.2.0"
 helmVersion="v2.6.0"
 clusterDomain="cluster.local"
- ```
+```
 ##### 2- Launch the script as user (with sudo power)
 
 `./install_k8s.sh --master`
 
-##### 3- You now play with kubectl, helm, calicoctl (...)
-
+##### 3- You can now play with k8s (...)
 ```
 $- kubectl get cs 
 NAME                 STATUS    MESSAGE              ERROR
@@ -65,14 +64,14 @@ You can expose easily your services with :
   - Expose on high TCP ports : `NodePort`
   - Expose publicly : Service's `ExternalIPs`
 
-##### 6- Add new node if needed :
+##### 6- Add new node :
 
 You can easily add a new to your cluster by launching `./install_new_worker.sh`
 
-Before launch the script, be sure to tweak the script config :
-
+Before launch the script, be sure to tweak the head of the script :
 ```
 nodeIP="__PUBLIC_OR_PRIVATE_IPV4__"
+sshUser="root"
 setupFirewall="True"
 CAcountry="US"
 ```
@@ -80,8 +79,9 @@ CAcountry="US"
 ### Requirements
 
 This script download each k8s components with `wget` and launch k8s with `systemd units`. 
-You will need `socat`, `conntrack` and `git` to fetch the Git repo !
+
+You will need `socat`, `conntrack`, `sudo` and `git` and you servers. 
+
 Simplekube is tested on `Debian 8/9` and `Ubuntu 16.x/17.x`.
 
 Feel free to open an Issue if you need assistance !
-
