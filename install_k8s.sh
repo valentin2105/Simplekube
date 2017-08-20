@@ -851,7 +851,7 @@ EOF
 helm init --service-account tiller --upgrade
 echo ""
 echo ""
-echo "Here his the deployed k8s files :
+echo "Created files/folder :
 
 /etc/systemd/system/kube-apiserver.service
 /etc/systemd/system/kube-controller-manager.service
@@ -860,8 +860,11 @@ echo "Here his the deployed k8s files :
 /etc/systemd/system/kubelet.service
 /etc/systemd/system/docker.service
 /etc/systemd/system/calico.service
+/var/lib/etcd
 /var/lib/kubernetes
 /var/lib/kubelet
+/var/lib/docker
+/etc/etcd
 "
 
 echo ""
