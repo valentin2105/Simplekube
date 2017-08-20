@@ -2,11 +2,11 @@
 
 > Simple as a shell script. It allow you to deploy easily k8s for tests or learn purposes.
 
-Simplekube is a simple way to install Kubernetes on Linux servers without have to plug with any cloud provider or VM Hypervisor. Just take a Linux empty box, clone the git repo, launch the script and have fun with k8s ! If you need, you can easily add new workers !
+With Simplekube, you can install Kubernetes on Linux servers without have to plug with any cloud provider or VM Hypervisor. Just take a Linux empty box, clone the git repo, launch the script and have fun with k8s ! If you need, you can easily add new workers !
 
-### How-to use it ?
+## How-to use it ?
 
-##### 1- Tweak the head of `install_k8s.sh`
+#### 1- Tweak the head of `install_k8s.sh`
  
 ```
 hostIP="__PUBLIC_OR_PRIVATE_IPV4__"
@@ -20,11 +20,11 @@ cfsslVersion="v1.2.0"
 helmVersion="v2.6.0"
 clusterDomain="cluster.local"
 ```
-##### 2- Launch the script as user (with sudo power)
+#### 2- Launch the script as user (with sudo power)
 
 `./install_k8s.sh --master`
 
-##### 3- You can now play with k8s (...)
+#### 3- You can now play with k8s (...)
 ```
 $- kubectl get cs 
 NAME                 STATUS    MESSAGE              ERROR
@@ -44,7 +44,7 @@ CIDR
 192.168.0.0/16
 fd80:24e2:f998:72d6::/64
 ```
-##### 4- Cluster's integrated components :
+#### 4- Cluster's integrated components :
 
   - KubeDNS
   - HELM ready
@@ -56,7 +56,7 @@ fd80:24e2:f998:72d6::/64
   - UFW to secure access (can be disabled)
   - ECDSA cluster certs
 
-##### 5- Expose services :
+#### 5- Expose services :
 
 You can expose easily your services with :
 
@@ -64,9 +64,9 @@ You can expose easily your services with :
   - Expose on high TCP ports : `NodePort`
   - Expose publicly : Service's `ExternalIPs`
 
-##### 6- Add new node :
+#### 6- Add new nodes :
 
-You can easily add a new to your cluster by launching `./install_new_worker.sh`
+You can easily add new nodes to your cluster by launching `./install_new_worker.sh`
 
 Before launch the script, be sure to tweak the head of the script :
 ```
@@ -76,7 +76,7 @@ setupFirewall="True"
 CAcountry="US"
 ```
 
-### Requirements
+## Requirements
 
 This script download each k8s components with `wget` and launch k8s with `systemd units`. 
 
