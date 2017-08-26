@@ -4,7 +4,7 @@
 hostIP="__PUBLIC_OR_PRIVATE_IPV4__"
 # -----------------------
 k8sVersion="v1.7.4"
-etcdVersion="v3.2.5"
+etcdVersion="v3.2.6"
 dockerVersion="17.05.0-ce"
 cniVersion="v0.5.2"
 calicoCniVersion="v1.10.0"
