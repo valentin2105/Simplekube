@@ -33,6 +33,9 @@ if [[ "$setupFirewall" == "True" ]]; then
         ufw enable
 fi
 
+## Resolv.conf
+echo "$hostIP	$hostname" >> /etc/resolv.conf
+
 ## Certs
 wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
 chmod +x cfssl_linux-amd64
@@ -879,13 +882,14 @@ fi
 
 if [[ "$1" == "--worker" ]]; then
 
+echo "$hostIP	$hostname" >> /etc/resolv.conf
+
 if [[ "$setupFirewall" == "True" ]]; then
         apt-get update && apt-get -y install ufw
         ufw allow ssh
 	ufw allow from $hostIP
         ufw enable
 fi
-
 
 wget https://get.docker.com/builds/Linux/x86_64/docker-"$dockerVersion".tgz
 tar -xvf docker-"$dockerVersion".tgz

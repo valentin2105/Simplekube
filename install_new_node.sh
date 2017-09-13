@@ -9,6 +9,8 @@ CAcountry="US"
 
 nodeHostname=$(ssh $sshUser@$nodeIP 'hostname')
 
+echo "$nodeIP	$hostname" >> /etc/resolv.conf
+
 if [ ! -f ca.pem ]; then
         echo "ca.pem don't exist, lauch ./install_k8s --master before !"
 	exit 1
@@ -71,5 +73,6 @@ scp ca.pem $sshUser@$nodeIP:/var/lib/kubernetes/
 scp install_k8s.sh $sshUser@$nodeIP:/opt/Simplekube/
 scp /var/lib/kubelet/kubeconfig $sshUser@$nodeIP:/var/lib/kubelet/
 ssh $sshUser@$nodeIP 'echo $nodeIP > /tmp/IP'
+ssh $sshUser@$nodeIP 'echo "$nodeIP	$nodeHostname" >> /etc/resolv.conf'
 
 ssh $sshUser@$nodeIP  '/opt/Simplekube/install_k8s.sh --worker'
