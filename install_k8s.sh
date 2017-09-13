@@ -34,7 +34,7 @@ if [[ "$setupFirewall" == "True" ]]; then
 fi
 
 ## Resolv.conf
-echo "$hostIP	$hostname" >> /etc/resolv.conf
+echo "$hostIP	$hostname" >> /etc/hosts
 
 ## Certs
 wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
@@ -882,7 +882,7 @@ fi
 
 if [[ "$1" == "--worker" ]]; then
 
-echo "$hostIP	$hostname" >> /etc/resolv.conf
+echo "$hostIP	$hostname" >> /etc/hosts
 
 if [[ "$setupFirewall" == "True" ]]; then
         apt-get update && apt-get -y install ufw
