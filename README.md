@@ -3,8 +3,10 @@
 > Simple as a shell script. It allow you to deploy easily k8s for tests or learn purposes.
 
 With Simplekube, you can install Kubernetes on Linux servers without have to plug with any cloud provider or VM Hypervisor. 
+
 Just take a Linux empty box, clone the git repo, launch the script and have fun with k8s ! 
 It come with few things like Kube-DNS, Calico, Helm and IPv6 !
+
 If you need, you can easily add new workers !
 
 ## How-to use it ?
