@@ -27,9 +27,10 @@ hostname=$(hostname)
 
 ## Let's go :
 if [[ "$1" == "--master" ]]; then
+        apt-get update && apt-get -y install socat conntrack
 
 if [[ "$setupFirewall" == "True" ]]; then
-        apt-get update && apt-get -y install ufw
+        apt-get -y install ufw
 	ufw allow ssh
         ufw allow 6443/tcp
         ufw enable

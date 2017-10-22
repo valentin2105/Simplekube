@@ -49,6 +49,11 @@ $- calicoctl get ippool
 CIDR
 192.168.0.0/16
 fd80:24e2:f998:72d6::/64
+
+$- kubectl run -i -t alpine --image=alpine --restart=Never
+/ # ping6 google.com
+PING google.com (2404:6800:4003:80d::200e): 56 data bytes
+64 bytes from 2404:6800:4003:80d::200e: seq=0 ttl=57 time=2.129 ms
 ```
 #### 4- Cluster's integrated components :
 
