@@ -2,8 +2,9 @@
 
 > Simple as a shell script. It allow you to deploy easily k8s for tests or learn purposes.
 
-With Simplekube, you can install Kubernetes on Linux servers without have to plug with any cloud provider or VM Hypervisor. Just take a Linux empty box, clone the git repo, launch the script and have fun with k8s ! 
-
+With Simplekube, you can install Kubernetes on Linux servers without have to plug with any cloud provider or VM Hypervisor. 
+Just take a Linux empty box, clone the git repo, launch the script and have fun with k8s ! 
+It come with few things like Kube-DNS, Calico, Helm and IPv6 !
 If you need, you can easily add new workers !
 
 ## How-to use it ?
@@ -11,16 +12,24 @@ If you need, you can easily add new workers !
 #### 1- Tweak the head of `install_k8s.sh`
  
 ```
+# please change this value :
 hostIP="__PUBLIC_OR_PRIVATE_IPV4__"
-k8sVersion="v1.7.4"
-etcdVersion="v3.2.6"
+# -----------------------
+k8sVersion="v1.8.1"
+etcdVersion="v3.2.9"
 dockerVersion="17.05.0-ce"
-cniVersion="v0.5.2"
-calicoCniVersion="v1.10.0"
-calicoctlVersion="v1.3.0"
+cniVersion="v0.6.0"
+calicoCNIVersion="v1.11.0"
+calicoctlVersion="v1.6.1"
 cfsslVersion="v1.2.0"
-helmVersion="v2.6.0"
-clusterDomain="cluster.local"
+helmVersion="v2.6.2"
+# -----------------------
+clusterDomain="cluster.local" # Default k8s domain
+enableIPv6="true" # Enable IPv6 on pod side (need IPv6 on host)
+IPv6Pool="fd80:24e2:f998:72d6::/64" # Default Calico NAT IPv6 Pool
+setupFirewall="True" # Setup UFW 
+enableIPinIP="True" # IPinIP is needed if VMs are not in the same LAN
+CAcountry="US"
 ```
 #### 2- Launch the script as user (with sudo power)
 
