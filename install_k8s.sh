@@ -481,16 +481,16 @@ sleep 5
 kubectl get cs ; echo "" ;  kubectl get nodes
 
 if [[ "$enableIPv6" == "true" ]]; then
-	echo -n "1" >/proc/sys/net/ipv6/conf/all/forwarding
-        echo "net.ipv6.conf.all.forwarding=1" > /etc/sysctl.d/80-ipv6-forward.conf
- 	calicoctl delete ippool fd80:24e2:f998:72d6::/64
-	cat <<EOF | calicoctl create -f -
-	- apiVersion: v1
-	  kind: ipPool
-	  metadata:
-	    cidr: $IPv6Pool
-	  spec:
-	      nat-outgoing: true
+echo -n "1" >/proc/sys/net/ipv6/conf/all/forwarding
+echo "net.ipv6.conf.all.forwarding=1" > /etc/sysctl.d/80-ipv6-forward.conf
+calicoctl delete ippool fd80:24e2:f998:72d6::/64
+cat <<EOF | calicoctl create -f -
+- apiVersion: v1
+  kind: ipPool
+  metadata:
+    cidr: $IPv6Pool
+  spec:
+    nat-outgoing: true
 EOF 
 fi
 
