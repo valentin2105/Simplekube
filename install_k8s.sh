@@ -1084,6 +1084,12 @@ sudo mv kube-proxy.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable kube-proxy
 sudo systemctl start kube-proxy
+
+if [[ "$enableIPv6" == "true" ]]; then
+	echo -n "1" >/proc/sys/net/ipv6/conf/all/forwarding
+        echo "net.ipv6.conf.all.forwarding=1" > /etc/sysctl.d/80-ipv6-forward.conf
+fi
+
 sleep 2
 #kubectl get node -o wide
 exit 0
