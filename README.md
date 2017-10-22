@@ -25,13 +25,6 @@ calicoCNIVersion="v1.11.0"
 calicoctlVersion="v1.6.1"
 cfsslVersion="v1.2.0"
 helmVersion="v2.6.2"
-# -----------------------
-clusterDomain="cluster.local" # Default k8s domain
-enableIPv6="true" # Enable IPv6 on pod side (need IPv6 on host)
-IPv6Pool="fd80:24e2:f998:72d6::/64" # Default Calico NAT IPv6 Pool
-setupFirewall="True" # Setup UFW 
-enableIPinIP="True" # IPinIP is needed if VMs are not in the same LAN
-CAcountry="US"
 ```
 #### 2- Launch the script as user (with sudo power)
 
@@ -68,6 +61,7 @@ fd80:24e2:f998:72d6::/64
   - Calicoctl tool
   - UFW to secure access (can be disabled)
   - ECDSA cluster certs w/ CFSSL
+  - IPv4/IPv6
 
 #### 5- Expose services :
 
@@ -76,6 +70,7 @@ You can expose easily your services with :
   - Only reachable on the machine : `ClusterIP`
   - Expose on high TCP ports : `NodePort`
   - Expose publicly : Service's `ExternalIPs`
+
 
 #### 6- Add new nodes :
 
@@ -96,6 +91,8 @@ This script download each k8s components with `wget` and launch k8s with `system
 You will need `socat`, `conntrack`, `sudo` and `git` on your servers. 
 
 To add a node, you will need to setup `key-based` SSH authentification between master & workers.
+
+If you want IPv6 on pods side, you need working IPv6 on hosts.
 
 Simplekube is tested on `Debian 8/9` and `Ubuntu 16.x/17.x`.
 
