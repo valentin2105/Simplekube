@@ -3,25 +3,27 @@
 # please change this value :
 hostIP="__PUBLIC_OR_PRIVATE_IPV4__"
 # -----------------------
-k8sVersion="v1.7.4"
-etcdVersion="v3.2.6"
+k8sVersion="v1.8.1"
+etcdVersion="v3.2.9"
 dockerVersion="17.05.0-ce"
-cniVersion="v0.5.2"
-calicoCniVersion="v1.10.0"
-calicoctlVersion="v1.3.0"
+cniVersion="v0.6.0"
+calicoCNIVersion="v1.11.0"
+calicoctlVersion="v1.6.1"
 cfsslVersion="v1.2.0"
-helmVersion="v2.6.0"
-clusterDomain="cluster.local"
-setupFirewall="True" #Setup UFW 
-enableIPinIP="True"
+helmVersion="v2.6.2"
+# -----------------------
+clusterDomain="cluster.local" # Default k8s domain
+enableIPv6="true" # Enable IPv6 on pod side (need IPv6 on host)
+IPv6Pool="fd80:24e2:f998:72d6::/64" # Default Calico NAT IPv6 Pool
+setupFirewall="True" # Setup UFW 
+enableIPinIP="True" # IPinIP is needed if VMs are not in the same LAN
 CAcountry="US"
-
+# -----------------------
+# -----------------------
 adminToken=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
 kubeletToken=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
 
 hostname=$(hostname)
-
-## TODO
 
 ## Let's go :
 if [[ "$1" == "--master" ]]; then
@@ -307,7 +309,8 @@ sudo docker version
 
 sudo mkdir -p /etc/cni/net.d
 wget https://github.com/containernetworking/cni/releases/download/"$cniVersion"/cni-amd64-"$cniVersion".tgz
-sudo tar -xvf cni-amd64-"$cniVersion".tgz -C /etc/cni/net.d
+wget wget https://github.com/containernetworking/plugins/releases/download/"$cniVersion"/cni-plugins-amd64-"$cniVersion".tgz
+sudo tar -xvf cni-plugins-amd64-"$cniVersion".tgz -C /etc/cni/net.d
 
 cat >  10-calico.conf <<EOF
 {
@@ -318,7 +321,7 @@ cat >  10-calico.conf <<EOF
     "ipam": {
         "type": "calico-ipam",
         "assign_ipv4": "true",
-        "assign_ipv6": "false"
+        "assign_ipv6": "$enableIPv6"
 
     },
     "policy": {
@@ -374,8 +377,8 @@ wget https://github.com/projectcalico/calicoctl/releases/download/$calicoctlVers
 chmod +x calicoctl
 sudo mv calicoctl /usr/local/bin
 
-wget https://github.com/projectcalico/cni-plugin/releases/download/$calicoCniVersion/calico
-wget https://github.com/projectcalico/cni-plugin/releases/download/$calicoCniVersion/calico-ipam
+wget https://github.com/projectcalico/cni-plugin/releases/download/$calicoCNIVersion/calico
+wget https://github.com/projectcalico/cni-plugin/releases/download/$calicoCNIVersion/calico-ipam
 chmod +x calico calico-ipam
 sudo mv calico /etc/cni/net.d
 sudo mv calico-ipam /etc/cni/net.d
@@ -434,7 +437,6 @@ ExecStart=/usr/bin/kubelet \
   --serialize-image-pulls=false \
   --tls-cert-file=/var/lib/kubernetes/kubernetes.pem \
   --tls-private-key-file=/var/lib/kubernetes/kubernetes-key.pem \
-  --api-servers=http://127.0.0.1:8080 \
   --v=2
 
 Restart=on-failure
@@ -477,6 +479,20 @@ sudo systemctl start kube-proxy
 
 sleep 5
 kubectl get cs ; echo "" ;  kubectl get nodes
+
+if [[ "$enableIPv6" == "true" ]]; then
+	echo -n "1" >/proc/sys/net/ipv6/conf/all/forwarding
+        echo "net.ipv6.conf.all.forwarding=1" > /etc/sysctl.d/80-ipv6-forward.conf
+ 	calicoctl delete ippool fd80:24e2:f998:72d6::/64
+	cat <<EOF | calicoctl create -f -
+	- apiVersion: v1
+	  kind: ipPool
+	  metadata:
+	    cidr: $IPv6Pool
+	  spec:
+	      nat-outgoing: true
+EOF 
+fi
 
 # IP-in-IP
 if [[ "$enableIPinIP" == "True" ]]; then
@@ -934,7 +950,7 @@ cat >  10-calico.conf <<EOF
     "ipam": {
         "type": "calico-ipam",
         "assign_ipv4": "true",
-        "assign_ipv6": "false"
+        "assign_ipv6": "$enableIPv6"
 
     },
     "policy": {
@@ -991,8 +1007,8 @@ wget https://github.com/projectcalico/calicoctl/releases/download/$calicoctlVers
 chmod +x calicoctl
 sudo mv calicoctl /usr/local/bin
 
-wget https://github.com/projectcalico/cni-plugin/releases/download/$calicoCniVersion/calico
-wget https://github.com/projectcalico/cni-plugin/releases/download/$calicoCniVersion/calico-ipam
+wget https://github.com/projectcalico/cni-plugin/releases/download/$calicoCNIVersion/calico
+wget https://github.com/projectcalico/cni-plugin/releases/download/$calicoCNIVersion/calico-ipam
 chmod +x calico calico-ipam
 sudo mv calico /etc/cni/net.d
 sudo mv calico-ipam /etc/cni/net.d
@@ -1029,7 +1045,6 @@ ExecStart=/usr/bin/kubelet \
   --serialize-image-pulls=false \
   --tls-cert-file=/var/lib/kubernetes/$hostname.pem \
   --tls-private-key-file=/var/lib/kubernetes/$hostname-key.pem \
-  --api-servers=https://$hostIP:6443 \
   --v=2
 
 Restart=on-failure
