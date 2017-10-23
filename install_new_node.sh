@@ -9,7 +9,7 @@ CAcountry="US"
 
 nodeHostname=$(ssh $sshUser@$nodeIP 'hostname')
 
-echo "$nodeIP	$hostname" >> /etc/hosts
+echo "$nodeIP	$nodeHostname" >> /etc/hosts
 
 if [ ! -f ca.pem ]; then
         echo "ca.pem don't exist, lauch ./install_k8s --master before !"

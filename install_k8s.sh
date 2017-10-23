@@ -480,6 +480,10 @@ sudo systemctl start kube-proxy
 sleep 5
 kubectl get cs ; echo "" ;  kubectl get nodes
 
+sysctl -w net.ipv4.ip_forward=1
+echo "net.ipv4.ip_forward = 1" > /etc/sysctl.d/81-ipv4-forward.conf
+
+
 if [[ "$enableIPv6" == "true" ]]; then
 echo -n "1" >/proc/sys/net/ipv6/conf/all/forwarding
 echo "net.ipv6.conf.all.forwarding=1" > /etc/sysctl.d/80-ipv6-forward.conf
@@ -1017,9 +1021,6 @@ sudo mv calico-ipam /etc/cni/net.d
 wget https://storage.googleapis.com/kubernetes-release/release/$k8sVersion/bin/linux/amd64/kubelet
 wget https://storage.googleapis.com/kubernetes-release/release/$k8sVersion/bin/linux/amd64/kube-proxy
 
-wget https://storage.googleapis.com/kubernetes-helm/helm-$helmVersion-linux-amd64.tar.gz
-tar -zxvf helm-$helmVersion-linux-amd64.tar.gz
-mv linux-amd64/helm /usr/local/bin
 
 chmod +x  kube-proxy kubelet
 sudo mv kube-proxy kubelet /usr/bin/
@@ -1085,6 +1086,9 @@ sudo mv kube-proxy.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable kube-proxy
 sudo systemctl start kube-proxy
+
+sysctl -w net.ipv4.ip_forward=1
+echo "net.ipv4.ip_forward = 1" > /etc/sysctl.d/81-ipv4-forward.conf
 
 if [[ "$enableIPv6" == "true" ]]; then
 	echo -n "1" >/proc/sys/net/ipv6/conf/all/forwarding
