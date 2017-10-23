@@ -309,8 +309,7 @@ sleep 2
 sudo docker version
 
 sudo mkdir -p /etc/cni/net.d
-wget https://github.com/containernetworking/cni/releases/download/"$cniVersion"/cni-amd64-"$cniVersion".tgz
-wget wget https://github.com/containernetworking/plugins/releases/download/"$cniVersion"/cni-plugins-amd64-"$cniVersion".tgz
+wget https://github.com/containernetworking/plugins/releases/download/"$cniVersion"/cni-plugins-amd64-"$cniVersion".tgz
 sudo tar -xvf cni-plugins-amd64-"$cniVersion".tgz -C /etc/cni/net.d
 
 cat >  10-calico.conf <<EOF
@@ -940,8 +939,8 @@ sleep 2
 sudo docker version
 
 sudo mkdir -p /etc/cni/net.d
-wget https://github.com/containernetworking/cni/releases/download/"$cniVersion"/cni-amd64-"$cniVersion".tgz
-sudo tar -xvf cni-amd64-"$cniVersion".tgz -C /etc/cni/net.d
+wget https://github.com/containernetworking/plugins/releases/download/"$cniVersion"/cni-plugins-amd64-"$cniVersion".tgz
+sudo tar -xvf cni-plugins-amd64-"$cniVersion".tgz -C /etc/cni/net.d
 
 cat >  10-calico.conf <<EOF
 {
