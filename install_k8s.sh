@@ -437,6 +437,8 @@ ExecStart=/usr/bin/kubelet \
   --serialize-image-pulls=false \
   --tls-cert-file=/var/lib/kubernetes/kubernetes.pem \
   --tls-private-key-file=/var/lib/kubernetes/kubernetes-key.pem \
+  --runtime-cgroups=/systemd/system.slice \
+  --kubelet-cgroups=/systemd/system.slice \
   --v=2
 
 Restart=on-failure
@@ -1047,6 +1049,8 @@ ExecStart=/usr/bin/kubelet \
   --serialize-image-pulls=false \
   --tls-cert-file=/var/lib/kubernetes/$hostname.pem \
   --tls-private-key-file=/var/lib/kubernetes/$hostname-key.pem \
+  --runtime-cgroups=/systemd/system.slice \
+  --kubelet-cgroups=/systemd/system.slice \
   --v=2
 
 Restart=on-failure
