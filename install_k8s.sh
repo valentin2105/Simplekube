@@ -485,7 +485,7 @@ if [[ "$enableIPv6" == "true" ]]; then
 echo -n "1" >/proc/sys/net/ipv6/conf/all/forwarding
 echo "net.ipv6.conf.all.forwarding=1" > /etc/sysctl.d/80-ipv6-forward.conf
 calicoctl delete ippool fd80:24e2:f998:72d6::/64
-sleep 1
+sleep 2
 cat <<EOF | calicoctl create -f -
 - apiVersion: v1
   kind: ipPool
@@ -493,7 +493,7 @@ cat <<EOF | calicoctl create -f -
     cidr: $IPv6Pool
   spec:
     nat-outgoing: true
-EOF 
+EOF
 fi
 
 # IP-in-IP
