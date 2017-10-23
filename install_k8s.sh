@@ -15,7 +15,7 @@ helmVersion="v2.6.2"
 clusterDomain="cluster.local" # Default k8s domain
 enableIPv6="true" # Enable IPv6 on pod side (need IPv6 on host)
 IPv6Pool="fd80:24e2:f998:72d6::/64" # Default Calico NAT IPv6 Pool
-setupFirewall="True" # Setup UFW 
+setupFirewall="False" # Setup UFW 
 enableIPinIP="True" # IPinIP is needed if VMs are not in the same LAN
 CAcountry="US"
 # -----------------------
