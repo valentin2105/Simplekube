@@ -822,7 +822,7 @@ spec:
         ports:
         - containerPort: 8080
           protocol: TCP
-      dnsPolicy: ClusterFirst  # Don't use cluster DNS.
+      dnsPolicy: Default  # Don't use cluster DNS.
 ---
 
 apiVersion: v1
