@@ -34,6 +34,8 @@ if [[ "$setupFirewall" == "True" ]]; then
 	ufw allow ssh
         ufw allow 6443/tcp
         ufw enable
+        sed -i -- 's/DEFAULT_FORWARD_POLICY="DROP"/DEFAULT_FORWARD_POLICY="ACCEPT"/g' /etc/default/ufw
+        service ufw restart
 fi
 
 ## Resolv.conf
