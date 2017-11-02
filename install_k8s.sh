@@ -455,6 +455,7 @@ sudo mv kubelet.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable kubelet
 sudo systemctl start kubelet
+mkdir /opt/cni/ && ln -s /etc/cni/net.d /opt/cni/bin
 
 cat > kube-proxy.service  <<EOF
 [Unit]
@@ -1067,6 +1068,7 @@ sudo mv kubelet.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable kubelet
 sudo systemctl start kubelet
+mkdir /opt/cni/ && ln -s /etc/cni/net.d /opt/cni/bin
 
 cat > kube-proxy.service  <<EOF
 [Unit]
