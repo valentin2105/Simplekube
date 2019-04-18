@@ -1,3 +1,14 @@
+# THIS PROJECT IS DEPRECATED
+
+I deprecated it because I can't maintain Kubernetes updates (and test them all). 
+Currently I am focused on maintaining https://github.com/valentin2105/Kubernetes-Saltstack which 
+allows the creation of a single node cluster, too. Using Saltstack is more generally flexible, and
+also allows the creation of a production cluster.
+
+**Other tools like Simplekube**: **[Minikube](https://github.com/kubernetes/minikube)**, **[k9s](https://k9ss.io/)**, **[microk8s](https://github.com/ubuntu/microk8s)**, etc. - these all focus on simple node installation.
+
+----
+
 <img src="https://i.imgur.com/gMGVimd.png" width="500">
 
 > Simple as a shell script. It allow you to deploy easily k8s for tests or learn purposes.
